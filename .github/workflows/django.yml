@@ -14,7 +14,14 @@ jobs:
       max-parallel: 4
       matrix:
         python-version: [3.13]
-
+    env:
+      POSTGRES_DB: ci_test_db
+      POSTGRES_USER: ci_user
+      POSTGRES_PASSWORD: ci_password
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+      SECRET_KEY: 'dummy-key-for-testing-only'
+  
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
