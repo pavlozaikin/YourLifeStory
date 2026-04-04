@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{% if object %}Edit{% else %}Create{% endif %} publication</h2>
+<p class="meta">Created: {% if object %}{{ object.created_at }}{% else %}-{% endif %}</p>
+<p class="meta">Updated: {% if object %}{{ object.updated_at }}{% else %}-{% endif %}</p>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Save</button>
+</form>
+<p><a href="{% url 'my-publications' %}">Back to my publications</a></p>
+{% endblock %}

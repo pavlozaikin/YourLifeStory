@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}My publications{% endblock %}
+{% block content %}
+<h2>My publications</h2>
+<div class="actions">
+  <a class="button-link" href="{% url 'publication-create' %}">Create publication</a>
+</div>
+
+<form method="get" class="filter-row">
+  <label>Search <input type="search" name="q" value="{{ request.GET.q }}"></label>
+  <label>Keyword
+    <select name="keyword">
+      <option value="">All</option>
+      {% for keyword in keywords %}
+        <option value="{{ keyword.pk }}" {% if request.GET.keyword == keyword.pk|stringformat:"s" %}selected{% endif %}>{{ keyword.name }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <button type="submit">Filter</button>
+</form>
+
+<ul class="card-list">
+  {% for publication in publications %}
+    <li>
+      <a href="{% url 'publication-detail' publication.pk %}">{{ publication.title }}</a>
+      <p class="meta">
+        {{ publication.get_status_display }} | {{ publication.get_visibility_display }}
+      </p>
+      <p class="meta">Created {{ publication.created_at }} | Updated {{ publication.updated_at }}</p>
+    </li>
+  {% empty %}
+    <li>No publications yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<h2>Login</h2>
+<p class="meta">Access your protected content with your username and password.</p>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Login</button>
+</form>
+{% if site_settings.self_signup_enabled %}
+  <p><a href="{% url 'signup' %}">Create an account</a></p>
+{% endif %}
+{% endblock %}

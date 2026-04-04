@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Public feed{% endblock %}
+{% block content %}
+<h2>Public feed</h2>
+<p class="meta">Newest public publications appear first.</p>
+<ul class="card-list">
+  {% for publication in publications %}
+    <li>
+      <a href="{% url 'publication-detail' publication.pk %}">{{ publication.title }}</a>
+      <p class="meta">By {{ publication.owner.username }}</p>
+      <p class="meta">Created {{ publication.created_at }} | Updated {{ publication.updated_at }}</p>
+      <p>{{ publication.content|truncatewords:30 }}</p>
+    </li>
+  {% empty %}
+    <li>No public publications yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

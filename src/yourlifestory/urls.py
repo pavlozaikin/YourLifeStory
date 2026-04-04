@@ -15,9 +15,26 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
+
+from core import views as core_views
+from publications import views as publication_views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path("admin/", admin.site.urls),
+    path("", core_views.feed, name="public-feed"),
+    path("feed/", core_views.feed, name="feed"),
+    path("workspace/", core_views.workspace, name="workspace"),
+    path("accounts/signup/", core_views.signup, name="signup"),
+    path("accounts/", include("django.contrib.auth.urls")),
+    path("publications/", publication_views.MyPublicationListView.as_view(), name="my-publications"),
+    path("publications/all/", publication_views.AllPublicationListView.as_view(), name="publication-all"),
+    path("publications/create/", publication_views.PublicationCreateView.as_view(), name="publication-create"),
+    path("publications/<int:pk>/", publication_views.PublicationDetailView.as_view(), name="publication-detail"),
+    path("publications/<int:pk>/edit/", publication_views.PublicationUpdateView.as_view(), name="publication-edit"),
+    path("publications/<int:pk>/delete/", publication_views.PublicationDeleteView.as_view(), name="publication-delete"),
+    path("publications/keywords/", publication_views.KeywordListView.as_view(), name="keyword-list"),
+    path("publications/keywords/create/", publication_views.KeywordCreateView.as_view(), name="keyword-create"),
+    path("publications/keywords/<int:pk>/edit/", publication_views.KeywordUpdateView.as_view(), name="keyword-edit"),
+    path("publications/keywords/<int:pk>/delete/", publication_views.KeywordDeleteView.as_view(), name="keyword-delete"),
 ]

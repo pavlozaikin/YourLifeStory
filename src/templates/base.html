@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}YourLifeStory{% endblock %}</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f4ed;
+      --panel: #fffdfa;
+      --ink: #1f2933;
+      --muted: #52606d;
+      --accent: #8d5a2b;
+      --accent-soft: #eadbc8;
+      --border: #d9c8b4;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      background: linear-gradient(180deg, #f2ebdf 0%, var(--bg) 100%);
+      color: var(--ink);
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    .shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    header,
+    main,
+    footer {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 1.25rem;
+      box-shadow: 0 14px 32px rgba(93, 64, 32, 0.08);
+    }
+
+    header {
+      margin-top: 1.5rem;
+    }
+
+    main {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1rem;
+      margin-top: 0.75rem;
+      align-items: center;
+    }
+
+    nav a,
+    nav span {
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+
+    .card-list {
+      list-style: none;
+      padding: 0;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .card-list li {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem;
+      background: #fff;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .messages {
+      list-style: none;
+      padding: 0;
+    }
+
+    .messages li {
+      background: var(--accent-soft);
+      border-radius: 10px;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    form p {
+      margin-bottom: 1rem;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      font: inherit;
+    }
+
+    button,
+    .button-link {
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: #fff;
+      border-radius: 999px;
+      padding: 0.55rem 1rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .button-link.secondary,
+    button.secondary {
+      background: transparent;
+      color: var(--accent);
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: end;
+      margin-bottom: 1rem;
+    }
+
+    .logout-form {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <h1><a href="{% url 'public-feed' %}">YourLifeStory</a></h1>
+      <p class="meta">A local-first web hub for personal research and writing.</p>
+      <nav>
+        <a href="{% url 'public-feed' %}">Public feed</a>
+        {% if request.user.is_authenticated %}
+          <a href="{% url 'my-publications' %}">My publications</a>
+          <a href="{% url 'keyword-list' %}">Keywords</a>
+          {% if request.user.is_staff %}
+            <a href="{% url 'publication-all' %}">All publications</a>
+            <a href="{% url 'admin:index' %}">Admin</a>
+          {% endif %}
+          <span>Signed in as {{ request.user.username }}</span>
+          <form method="post" action="{% url 'logout' %}" class="logout-form">
+            {% csrf_token %}
+            <button type="submit" class="secondary">Logout</button>
+          </form>
+        {% else %}
+          {% if site_settings.self_signup_enabled %}
+            <a href="{% url 'signup' %}">Sign up</a>
+          {% endif %}
+          <a href="{% url 'login' %}">Login</a>
+        {% endif %}
+      </nav>
+    </header>
+    <main>
+      {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+    <footer>
+      <p class="meta">
+        Public content appears in the feed. Drafts and non-public items stay protected by session authentication.
+      </p>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Workspace | YourLifeStory{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h1>Your workspace</h1>
+    <p>This protected area is ready for authenticated modules such as Publications.</p>
+    <p class="meta">Signed in as {{ request.user.username }}.</p>
+  </section>
+{% endblock %}

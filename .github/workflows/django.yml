@@ -15,12 +15,8 @@ jobs:
       matrix:
         python-version: [3.13]
     env:
-      POSTGRES_DB: ci_test_db
-      POSTGRES_USER: ci_user
-      POSTGRES_PASSWORD: ci_password
-      POSTGRES_HOST: localhost
-      POSTGRES_PORT: 5432
       SECRET_KEY: 'dummy-key-for-testing-only'
+      USE_SQLITE: "1"
   
     steps:
     - uses: actions/checkout@v4
@@ -34,4 +30,6 @@ jobs:
         pip install -r src/requirements.txt
     - name: Run Tests
       run: |
+        python src/manage.py check
+        python src/manage.py makemigrations --check --dry-run
         python src/manage.py test
