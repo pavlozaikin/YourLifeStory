@@ -1,14 +1,15 @@
 {% extends "base.html" %}
+{% load core_markdown %}
 {% block title %}{{ publication.title }}{% endblock %}
 {% block content %}
-<article>
+<article class="panel">
   <h2>{{ publication.title }}</h2>
   <p class="meta">By {{ publication.owner.username }}</p>
   <p class="meta">Status: {{ publication.get_status_display }}</p>
   <p class="meta">Visibility: {{ publication.get_visibility_display }}</p>
   <p class="meta">Created: {{ publication.created_at }}</p>
   <p class="meta">Updated: {{ publication.updated_at }}</p>
-  <div>{{ publication.content|linebreaks }}</div>
+  <div class="markdown-output">{{ publication.content|markdown }}</div>
   <p>
     Keywords:
     {% for keyword in publication.keywords.all %}
@@ -17,11 +18,12 @@
       <span>None</span>
     {% endfor %}
   </p>
-  {% if can_edit %}
-    <div class="actions">
+  <div class="actions">
+    <a class="button-link secondary" href="{% url 'publication-download' publication.pk %}">Download markdown</a>
+    {% if can_edit %}
       <a class="button-link" href="{% url 'publication-edit' publication.pk %}">Edit</a>
       <a class="button-link secondary" href="{% url 'publication-delete' publication.pk %}">Delete</a>
-    </div>
-  {% endif %}
+    {% endif %}
+  </div>
 </article>
 {% endblock %}

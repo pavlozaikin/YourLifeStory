@@ -27,6 +27,7 @@
         {{ publication.get_status_display }} | {{ publication.get_visibility_display }}
       </p>
       <p class="meta">Created {{ publication.created_at }} | Updated {{ publication.updated_at }}</p>
+      <p><a href="{% url 'publication-download' publication.pk %}">Download markdown</a></p>
     </li>
   {% empty %}
     <li>No publications yet.</li>

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Journals{% endblock %}
+{% block content %}
+<section>
+  <h2>Your journals</h2>
+  <p class="meta">Every account gets a Personal Journal automatically. You can create more journals for different collections of entries.</p>
+  <div class="actions">
+    <a class="button-link" href="{% url 'journal:journal-create' %}">Create journal</a>
+    <a class="button-link secondary" href="{% url 'journal:journal-entry-create' %}">Create entry</a>
+  </div>
+  <ul class="card-list">
+    {% for journal in journals %}
+      <li>
+        <h3>
+          <a href="{% url 'journal:journal-detail' journal.pk %}">{{ journal.display_title }}</a>
+        </h3>
+        <p class="meta">
+          {% if journal.is_personal %}Personal journal{% else %}Custom journal{% endif %}
+          | {{ journal.entries.count }} entries
+        </p>
+        {% if not journal.is_personal %}
+          <p>
+            <a href="{% url 'journal:journal-edit' journal.pk %}">Edit</a>
+            <a href="{% url 'journal:journal-delete' journal.pk %}">Delete</a>
+          </p>
+        {% endif %}
+      </li>
+    {% empty %}
+      <li>No journals yet.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

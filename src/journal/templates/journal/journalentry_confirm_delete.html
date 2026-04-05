@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% block title %}Delete journal entry{% endblock %}
 {% block content %}
 <section>
   <h2>Delete journal entry</h2>
   <p>Are you sure you want to delete "{{ entry.display_title }}"?</p>
   <form method="post">
     {% csrf_token %}
-    <button type="submit">Delete</button>
+    <button type="submit" class="secondary">Delete</button>
   </form>
   <p><a href="{% url 'journal:journal-entry-detail' entry.pk %}">Cancel</a></p>
 </section>

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load core_markdown %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block content %}
+<article class="panel">
+  <h2>{{ post.title }}</h2>
+  <p class="meta">By {{ post.owner.username }}</p>
+  <p class="meta">Visibility: {{ post.get_visibility_display }}</p>
+  <p class="meta">Created: {{ post.created_at }}</p>
+  <p class="meta">Updated: {{ post.updated_at }}</p>
+  <div class="markdown-output">{{ post.content|markdown }}</div>
+  <div class="actions">
+    {% if can_edit %}
+      <a class="button-link" href="{% url 'post-edit' post.pk %}">Edit</a>
+      <a class="button-link secondary" href="{% url 'post-delete' post.pk %}">Delete</a>
+    {% endif %}
+  </div>
+</article>
+{% endblock %}

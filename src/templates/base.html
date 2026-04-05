@@ -91,6 +91,13 @@
       background: #fff;
     }
 
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem;
+      background: #fff;
+    }
+
     .meta {
       color: var(--muted);
       font-size: 0.95rem;
@@ -147,6 +154,59 @@
     .logout-form {
       margin: 0;
     }
+
+    .username-link {
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .markdown-editor {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .markdown-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .markdown-toolbar button {
+      border-radius: 999px;
+      padding: 0.35rem 0.8rem;
+      background: #fff;
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+
+    .markdown-editor-input {
+      width: 100%;
+      min-height: 18rem;
+      resize: vertical;
+    }
+
+    .markdown-output {
+      line-height: 1.6;
+    }
+
+    .markdown-output blockquote {
+      margin: 1rem 0;
+      padding-left: 1rem;
+      border-left: 4px solid var(--border);
+      color: var(--muted);
+    }
+
+    .markdown-output pre,
+    .markdown-output code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    .markdown-output pre {
+      background: #f3ede4;
+      padding: 0.75rem;
+      border-radius: 12px;
+      overflow-x: auto;
+    }
   </style>
 </head>
 <body>
@@ -158,13 +218,14 @@
         <a href="{% url 'public-feed' %}">Public feed</a>
         {% if request.user.is_authenticated %}
           <a href="{% url 'my-publications' %}">My publications</a>
+          <a href="{% url 'post-list' %}">My posts</a>
           <a href="{% url 'journal:journal-list' %}">Journal</a>
           <a href="{% url 'keyword-list' %}">Keywords</a>
           {% if request.user.is_staff %}
             <a href="{% url 'publication-all' %}">All publications</a>
             <a href="{% url 'admin:index' %}">Admin</a>
           {% endif %}
-          <span>Signed in as {{ request.user.username }}</span>
+          <a class="username-link" href="{% url 'workspace' %}">Signed in as {{ request.user.username }}</a>
           <form method="post" action="{% url 'logout' %}" class="logout-form">
             {% csrf_token %}
             <button type="submit" class="secondary">Logout</button>
@@ -193,5 +254,79 @@
       </p>
     </footer>
   </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll("[data-markdown-editor-shell]").forEach((shell) => {
+        const textarea = shell.querySelector("[data-markdown-editor='true']");
+        const toolbar = shell.querySelector(".markdown-toolbar");
+        if (!textarea || !toolbar) {
+          return;
+        }
+
+        const replaceSelection = (before, after, lineMode, placeholder) => {
+          const value = textarea.value;
+          const start = textarea.selectionStart ?? 0;
+          const end = textarea.selectionEnd ?? 0;
+
+          if (lineMode) {
+            const lineStart = value.lastIndexOf("\n", Math.max(0, start - 1)) + 1;
+            const lineEndIndex = value.indexOf("\n", end);
+            const lineEnd = lineEndIndex === -1 ? value.length : lineEndIndex;
+            const block = value.slice(lineStart, lineEnd);
+            const replacement = block
+              .split("\n")
+              .map((line) => `${before}${line}${after}`)
+              .join("\n");
+
+            textarea.value = value.slice(0, lineStart) + replacement + value.slice(lineEnd);
+            textarea.setSelectionRange(lineStart, lineStart + replacement.length);
+            return;
+          }
+
+          const selected = value.slice(start, end) || placeholder;
+          const replacement = `${before}${selected}${after}`;
+          textarea.value = value.slice(0, start) + replacement + value.slice(end);
+          const selectionStart = start + before.length;
+          const selectionEnd = selectionStart + selected.length;
+          textarea.setSelectionRange(selectionStart, selectionEnd);
+        };
+
+        toolbar.addEventListener("click", (event) => {
+          const button = event.target.closest("button[data-markdown-action]");
+          if (!button) {
+            return;
+          }
+
+          event.preventDefault();
+          textarea.focus();
+
+          if (button.dataset.markdownAction === "link") {
+            const url = window.prompt("Link URL");
+            if (!url) {
+              return;
+            }
+
+            const value = textarea.value;
+            const start = textarea.selectionStart ?? 0;
+            const end = textarea.selectionEnd ?? 0;
+            const selected = value.slice(start, end) || "link text";
+            const replacement = `[${selected}](${url})`;
+            textarea.value = value.slice(0, start) + replacement + value.slice(end);
+            textarea.setSelectionRange(start + 1, start + 1 + selected.length);
+            textarea.dispatchEvent(new Event("input", { bubbles: true }));
+            return;
+          }
+
+          replaceSelection(
+            button.dataset.markdownBefore || "",
+            button.dataset.markdownAfter || "",
+            button.dataset.markdownLine === "true",
+            button.dataset.markdownPlaceholder || "text"
+          );
+          textarea.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+      });
+    });
+  </script>
 </body>
 </html>

@@ -15,6 +15,7 @@ class PublicationModelTests(TestCase):
             password="Password123!",
             email="admin@example.com",
         )
+        self.keyword = Keyword.objects.create(owner=self.owner, name="history")
 
     def test_owner_can_view_private_draft(self):
         publication = Publication.objects.create(
@@ -39,6 +40,11 @@ class PublicationModelTests(TestCase):
         self.assertIsNotNone(publication.created_at)
         self.assertIsNotNone(publication.updated_at)
 
+    def test_keywords_are_scoped_per_owner(self):
+        other_keyword = Keyword.objects.create(owner=self.other_user, name="history")
+
+        self.assertNotEqual(self.keyword.pk, other_keyword.pk)
+
 
 class PublicationViewTests(TestCase):
     def setUp(self):
@@ -50,7 +56,7 @@ class PublicationViewTests(TestCase):
             password="Password123!",
             email="admin@example.com",
         )
-        self.keyword = Keyword.objects.create(name="history")
+        self.keyword = Keyword.objects.create(owner=self.owner, name="history")
         self.publication = Publication.objects.create(
             owner=self.owner,
             title="Family archive",
@@ -84,6 +90,29 @@ class PublicationViewTests(TestCase):
         self.assertRedirects(response, reverse("publication-detail", args=[created.pk]))
         self.assertEqual(created.owner, self.owner)
         self.assertEqual(created.keywords.get(), self.keyword)
+
+    def test_publication_editor_creates_new_keywords_for_current_user(self):
+        self.client.login(username="owner", password="Password123!")
+
+        response = self.client.post(
+            reverse("publication-create"),
+            {
+                "title": "Tagged paper",
+                "content": "A body of research",
+                "status": Publication.Status.DRAFT,
+                "visibility": Publication.Visibility.PRIVATE,
+                "new_keywords": "memoir, archives",
+            },
+        )
+
+        created = Publication.objects.get(title="Tagged paper")
+        self.assertRedirects(response, reverse("publication-detail", args=[created.pk]))
+        self.assertQuerySetEqual(
+            created.keywords.order_by("name").values_list("name", flat=True),
+            ["archives", "memoir"],
+            transform=lambda value: value,
+        )
+        self.assertTrue(Keyword.objects.filter(owner=self.owner, name="memoir").exists())
 
     def test_owner_can_update_publication(self):
         self.client.login(username="owner", password="Password123!")
@@ -171,7 +200,7 @@ class PublicationViewTests(TestCase):
         self.assertNotContains(response, self.publication.title)
 
     def test_keyword_filter_limits_results(self):
-        other_keyword = Keyword.objects.create(name="science")
+        other_keyword = Keyword.objects.create(owner=self.owner, name="science")
         second_publication = Publication.objects.create(
             owner=self.owner,
             title="Lab notes",
@@ -186,6 +215,24 @@ class PublicationViewTests(TestCase):
 
         self.assertContains(response, self.publication.title)
         self.assertNotContains(response, "Lab notes")
+
+    def test_keyword_list_is_scoped_to_current_user(self):
+        Keyword.objects.create(owner=self.viewer, name="private-tag")
+        self.client.login(username="owner", password="Password123!")
+
+        response = self.client.get(reverse("keyword-list"))
+
+        self.assertContains(response, self.keyword.name)
+        self.assertNotContains(response, "private-tag")
+
+    def test_publication_download_uses_expected_filename(self):
+        self.client.login(username="owner", password="Password123!")
+
+        response = self.client.get(reverse("publication-download", args=[self.publication.pk]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("text/markdown", response["Content-Type"])
+        self.assertIn("owner_Family_archive.md", response["Content-Disposition"])
 
     def test_keyword_management_requires_authentication(self):
         response = self.client.get(reverse("keyword-list"))

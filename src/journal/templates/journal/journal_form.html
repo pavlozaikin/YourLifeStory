@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{% if object %}Edit journal{% else %}Create journal{% endif %}{% endblock %}
+{% block content %}
+<section>
+  <h2>{% if object %}Edit{% else %}Create{% endif %} journal</h2>
+  <p class="meta">The Personal Journal is created automatically and cannot be deleted.</p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <p>
+      {{ form.title.label_tag }}
+      {{ form.title }}
+      {{ form.title.errors }}
+    </p>
+    <button type="submit">Save</button>
+  </form>
+  <p><a href="{% url 'journal:journal-list' %}">Back to journals</a></p>
+</section>
+{% endblock %}

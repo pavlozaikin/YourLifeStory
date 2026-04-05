@@ -1,18 +1,52 @@
 {% extends "base.html" %}
 {% block title %}Public feed{% endblock %}
 {% block content %}
-<h2>Public feed</h2>
-<p class="meta">Newest public publications appear first.</p>
-<ul class="card-list">
-  {% for publication in publications %}
-    <li>
-      <a href="{% url 'publication-detail' publication.pk %}">{{ publication.title }}</a>
-      <p class="meta">By {{ publication.owner.username }}</p>
-      <p class="meta">Created {{ publication.created_at }} | Updated {{ publication.updated_at }}</p>
-      <p>{{ publication.content|truncatewords:30 }}</p>
-    </li>
-  {% empty %}
-    <li>No public publications yet.</li>
-  {% endfor %}
-</ul>
+<section class="panel">
+  <h2>Feed</h2>
+  <p class="meta">
+    {% if request.user.is_authenticated %}
+      Signed-in readers can see posts for authenticated users and public posts here.
+    {% else %}
+      Public posts and publications appear here for everyone to read.
+    {% endif %}
+  </p>
+</section>
+
+<section class="panel" style="margin-top: 1rem;">
+  <h3>Posts</h3>
+  {% if request.user.is_authenticated %}
+    <div class="actions">
+      <a class="button-link" href="{% url 'post-create' %}">Write post</a>
+      <a class="button-link secondary" href="{% url 'post-list' %}">My posts</a>
+    </div>
+  {% endif %}
+  <ul class="card-list">
+    {% for post in posts %}
+      <li>
+        <a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a>
+        <p class="meta">
+          By {{ post.owner.username }} | {{ post.get_visibility_display }} | {{ post.created_at }}
+        </p>
+        <p>{{ post.content|truncatewords:30 }}</p>
+      </li>
+    {% empty %}
+      <li>No posts available yet.</li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="panel" style="margin-top: 1rem;">
+  <h3>Public publications</h3>
+  <ul class="card-list">
+    {% for publication in publications %}
+      <li>
+        <a href="{% url 'publication-detail' publication.pk %}">{{ publication.title }}</a>
+        <p class="meta">By {{ publication.owner.username }} | {{ publication.created_at }}</p>
+        <p>{{ publication.content|truncatewords:30 }}</p>
+      </li>
+    {% empty %}
+      <li>No public publications yet.</li>
+    {% endfor %}
+  </ul>
+</section>
 {% endblock %}

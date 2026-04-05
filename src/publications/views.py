@@ -1,12 +1,15 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import redirect_to_login
+from django.http import HttpResponse
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from publications.forms import KeywordForm, PublicationForm
 from publications.models import Keyword, Publication
+from publications.utils import publication_download_filename, publication_markdown
 
 
 def _publication_filters(queryset, request):
@@ -91,10 +94,27 @@ class PublicationDetailView(PublicationAccessMixin, DetailView):
         return context
 
 
+class PublicationDownloadView(PublicationAccessMixin, View):
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(
+            publication_markdown(self.object),
+            content_type="text/markdown; charset=utf-8",
+        )
+        response["Content-Disposition"] = (
+            f'attachment; filename="{publication_download_filename(self.object)}"'
+        )
+        return response
+
+
 class PublicationCreateView(LoginRequiredMixin, CreateView):
     model = Publication
     form_class = PublicationForm
     template_name = "publications/publication_form.html"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -108,6 +128,11 @@ class PublicationUpdateView(PublicationOwnerMixin, UpdateView):
     model = Publication
     form_class = PublicationForm
     template_name = "publications/publication_form.html"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
     def get_success_url(self):
         return reverse_lazy("publication-detail", kwargs={"pk": self.object.pk})

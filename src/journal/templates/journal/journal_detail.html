@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ journal.display_title }}{% endblock %}
+{% block content %}
+<section>
+  <h2>{{ journal.display_title }}</h2>
+  <p class="meta">{% if journal.is_personal %}Personal journal{% else %}Custom journal{% endif %}</p>
+  <div class="actions">
+    <a class="button-link" href="{% url 'journal:journal-entry-create' %}?journal={{ journal.pk }}">Create entry in this journal</a>
+    {% if not journal.is_personal %}
+      <a class="button-link secondary" href="{% url 'journal:journal-edit' journal.pk %}">Edit journal</a>
+      <a class="button-link secondary" href="{% url 'journal:journal-delete' journal.pk %}">Delete journal</a>
+    {% endif %}
+  </div>
+  <ul class="card-list">
+    {% for entry in entries %}
+      <li>
+        <a href="{% url 'journal:journal-entry-detail' entry.pk %}">{{ entry.display_title }}</a>
+        <p class="meta">
+          {{ entry.get_visibility_display }}
+          | Created {{ entry.created_at }}
+          | Updated {{ entry.updated_at }}
+        </p>
+        <p><a href="{% url 'journal:journal-entry-download' entry.pk %}">Download markdown</a></p>
+      </li>
+    {% empty %}
+      <li>No entries in this journal yet.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

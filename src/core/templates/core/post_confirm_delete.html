@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Delete post{% endblock %}
+{% block content %}
+<section class="panel">
+  <h2>Delete post</h2>
+  <p>Are you sure you want to delete "{{ object.title }}"?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="secondary">Delete</button>
+    <a class="button-link secondary" href="{% url 'post-detail' object.pk %}">Cancel</a>
+  </form>
+</section>
+{% endblock %}

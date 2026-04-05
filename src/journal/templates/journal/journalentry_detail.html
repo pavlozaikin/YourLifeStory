@@ -3,14 +3,31 @@
 {% block content %}
 <article>
   <h2>{{ entry.display_title }}</h2>
-  <p class="meta">Journal: {{ entry.journal.title }}</p>
+  <p class="meta">Visibility: {{ entry.get_visibility_display }}</p>
   <p class="meta">Created: {{ entry.created_at }}</p>
   <p class="meta">Updated: {{ entry.updated_at }}</p>
-  <div>{{ entry.content|linebreaks }}</div>
+  <p class="meta">
+    Journals:
+    {% for journal in entry.journals.all %}
+      <span>{{ journal.display_title }}</span>{% if not forloop.last %}, {% endif %}
+    {% empty %}
+      <span>Personal Journal</span>
+    {% endfor %}
+  </p>
+  {% if entry.shared_with.exists %}
+    <p class="meta">
+      Shared with:
+      {% for user in entry.shared_with.all %}
+        <span>{{ user.username }}</span>{% if not forloop.last %}, {% endif %}
+      {% endfor %}
+    </p>
+  {% endif %}
+  <div>{{ entry.rendered_content }}</div>
   <div class="actions">
     <a class="button-link" href="{% url 'journal:journal-entry-edit' entry.pk %}">Edit</a>
+    <a class="button-link secondary" href="{% url 'journal:journal-entry-download' entry.pk %}">Download markdown</a>
     <a class="button-link secondary" href="{% url 'journal:journal-entry-delete' entry.pk %}">Delete</a>
   </div>
-  <p><a href="{% url 'journal:journal-list' %}">Back to journal</a></p>
+  <p><a href="{% url 'journal:journal-list' %}">Back to journals</a></p>
 </article>
 {% endblock %}

@@ -3,14 +3,46 @@
 {% block content %}
 <section>
   <h2>{% if object %}Edit{% else %}Create{% endif %} journal entry</h2>
-  <p class="meta">Journal: {{ journal.title }}</p>
+  <p class="meta">Personal journal: {{ personal_journal.display_title|default:"Personal Journal" }}</p>
+  <p class="meta">Current journal: {{ journal.display_title|default:"Personal Journal" }}</p>
   <p class="meta">Created: {% if object %}{{ object.created_at }}{% else %}-{% endif %}</p>
   <p class="meta">Updated: {% if object %}{{ object.updated_at }}{% else %}-{% endif %}</p>
   <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {{ form.non_field_errors }}
+    <p>
+      {{ form.title.label_tag }}
+      {{ form.title }}
+      {{ form.title.errors }}
+    </p>
+    <p>
+      {{ form.visibility.label_tag }}
+      {{ form.visibility }}
+      {{ form.visibility.errors }}
+    </p>
+    <fieldset>
+      <legend>Invite users</legend>
+      {{ form.shared_with.errors }}
+      {{ form.shared_with }}
+    </fieldset>
+    <fieldset>
+      <legend>Additional journals</legend>
+      <p class="meta">Personal Journal is added automatically to every entry.</p>
+      {{ form.journals.errors }}
+      {{ form.journals }}
+    </fieldset>
+    <p>
+      <label for="{{ form.content.id_for_label }}">{{ form.content.label }}</label>
+      {% include "shared/markdown_editor.html" with field=form.content %}
+      {{ form.content.errors }}
+    </p>
     <button type="submit">Save</button>
   </form>
-  <p><a href="{% url 'journal:journal-list' %}">Back to journal</a></p>
+  {% if object %}
+    <div class="actions">
+      <a class="button-link secondary" href="{% url 'journal:journal-entry-download' object.pk %}">Download markdown</a>
+    </div>
+  {% endif %}
+  <p><a href="{% url 'journal:journal-list' %}">Back to journals</a></p>
 </section>
 {% endblock %}
