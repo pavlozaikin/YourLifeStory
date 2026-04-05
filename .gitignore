@@ -212,3 +212,5 @@ __marimo__/
 # CODEX
 CODEX.md
 .codex
+how-to-run.md
+.docker/postgres/data/

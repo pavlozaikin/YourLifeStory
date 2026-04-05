@@ -5,7 +5,27 @@
 {% block content %}
   <section class="panel">
     <h1>Your workspace</h1>
-    <p>This protected area is ready for authenticated modules such as Publications.</p>
+    <p>This protected area is ready for authenticated modules such as Publications and Journal.</p>
     <p class="meta">Signed in as {{ request.user.username }}.</p>
+  </section>
+
+  <section class="panel" style="margin-top: 1rem;">
+    <h2>Modules</h2>
+    <ul class="card-list">
+      <li>
+        <h3>Publications</h3>
+        <p class="meta">Write structured publications with keywords, visibility, and public feed support.</p>
+        <div class="actions">
+          <a class="button-link" href="{% url 'my-publications' %}">Open publications</a>
+        </div>
+      </li>
+      <li>
+        <h3>Journal</h3>
+        <p class="meta">Keep private day-to-day journal entries in your personal journal workspace.</p>
+        <div class="actions">
+          <a class="button-link" href="{% url 'journal:journal-list' %}">Open journal</a>
+        </div>
+      </li>
+    </ul>
   </section>
 {% endblock %}

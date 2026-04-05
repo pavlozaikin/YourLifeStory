@@ -7,6 +7,8 @@ services:
       - "8000:8000"
     volumes:
       - ./src:/app
+    environment:
+      POSTGRES_HOST: database
     depends_on:
       database:
         condition: service_healthy
@@ -22,7 +24,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - postgres_db:/var/lib/postgresql/data
+      - ./.docker/postgres/data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 10s
@@ -31,6 +33,3 @@ services:
       timeout: 5s
     ports:
       - "5432:5432"
-
-volumes:
-  postgres_db:

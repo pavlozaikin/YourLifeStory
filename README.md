@@ -25,3 +25,14 @@ Manage information about your close relatives regardless of their location. Get 
 Django – Python Web Framework
 PostgreSQL – Database
 Docker – Containerization
+
+## Database
+This project uses PostgreSQL only.
+
+- Docker persists PostgreSQL data in `./.docker/postgres/data`.
+- Create a project `.env` from `.env.example` before running Django.
+- Host-side Django commands load PostgreSQL settings from the project `.env`.
+- Set `POSTGRES_HOST=localhost` in `.env` for host-run Django commands.
+- The Docker Compose app container overrides `POSTGRES_HOST` to `database`.
+- This keeps one shared PostgreSQL dataset across Docker restarts and when switching between Dockerized and host-run Django processes.
+- Missing PostgreSQL variables now fail fast during Django startup instead of falling back to implicit credentials.

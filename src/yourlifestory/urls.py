@@ -27,6 +27,7 @@ urlpatterns = [
     path("workspace/", core_views.workspace, name="workspace"),
     path("accounts/signup/", core_views.signup, name="signup"),
     path("accounts/", include("django.contrib.auth.urls")),
+    path("journal/", include(("journal.urls", "journal"), namespace="journal")),
     path("publications/", publication_views.MyPublicationListView.as_view(), name="my-publications"),
     path("publications/all/", publication_views.AllPublicationListView.as_view(), name="publication-all"),
     path("publications/create/", publication_views.PublicationCreateView.as_view(), name="publication-create"),

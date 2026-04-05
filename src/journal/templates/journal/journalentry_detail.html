@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ entry.display_title }}{% endblock %}
+{% block content %}
+<article>
+  <h2>{{ entry.display_title }}</h2>
+  <p class="meta">Journal: {{ entry.journal.title }}</p>
+  <p class="meta">Created: {{ entry.created_at }}</p>
+  <p class="meta">Updated: {{ entry.updated_at }}</p>
+  <div>{{ entry.content|linebreaks }}</div>
+  <div class="actions">
+    <a class="button-link" href="{% url 'journal:journal-entry-edit' entry.pk %}">Edit</a>
+    <a class="button-link secondary" href="{% url 'journal:journal-entry-delete' entry.pk %}">Delete</a>
+  </div>
+  <p><a href="{% url 'journal:journal-list' %}">Back to journal</a></p>
+</article>
+{% endblock %}

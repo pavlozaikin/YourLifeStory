@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}My journal{% endblock %}
+{% block content %}
+<section>
+  <h2>{{ journal.title }}</h2>
+  <p class="meta">Your private journal entries.</p>
+  <div class="actions">
+    <a class="button-link" href="{% url 'journal:journal-entry-create' %}">Create entry</a>
+  </div>
+  <ul class="card-list">
+    {% for entry in entries %}
+      <li>
+        <a href="{% url 'journal:journal-entry-detail' entry.pk %}">{{ entry.display_title }}</a>
+        <p class="meta">Created {{ entry.created_at }} | Updated {{ entry.updated_at }}</p>
+      </li>
+    {% empty %}
+      <li>
+        <p>No journal entries yet.</p>
+        <p class="meta">Create your first entry to begin capturing thoughts.</p>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}
