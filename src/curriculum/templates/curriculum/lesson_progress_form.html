@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Update lesson progress | YourLifeStory{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h1>Update lesson progress</h1>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="actions">
+        <button type="submit">Save</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}

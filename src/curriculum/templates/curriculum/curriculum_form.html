@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Curriculum form | YourLifeStory{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h1>{% if form.instance.pk %}Edit curriculum{% else %}Create curriculum{% endif %}</h1>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="actions">
+        <button type="submit">Save</button>
+        {% if form.instance.pk %}
+          <a class="button-link secondary" href="{% url 'curriculum:curriculum-detail' form.instance.pk %}">Cancel</a>
+        {% else %}
+          <a class="button-link secondary" href="{% url 'curriculum:curriculum-list' %}">Cancel</a>
+        {% endif %}
+      </div>
+    </form>
+  </section>
+{% endblock %}
+

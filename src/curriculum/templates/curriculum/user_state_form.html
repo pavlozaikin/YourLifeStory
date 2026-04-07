@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Update curriculum status | YourLifeStory{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h1>Update your curriculum status</h1>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="actions">
+        <button type="submit">Save</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}
+

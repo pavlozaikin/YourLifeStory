@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Delete curriculum | YourLifeStory{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h1>Delete curriculum</h1>
+    <p>Delete "{{ curriculum.title }}"?</p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="actions">
+        <button type="submit">Delete</button>
+        <a class="button-link secondary" href="{% url 'curriculum:curriculum-detail' curriculum.pk %}">Cancel</a>
+      </div>
+    </form>
+  </section>
+{% endblock %}
+

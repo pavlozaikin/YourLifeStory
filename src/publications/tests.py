@@ -15,7 +15,6 @@ class PublicationModelTests(TestCase):
             password="Password123!",
             email="admin@example.com",
         )
-        self.keyword = Keyword.objects.create(owner=self.owner, name="history")
 
     def test_owner_can_view_private_draft(self):
         publication = Publication.objects.create(
@@ -40,10 +39,16 @@ class PublicationModelTests(TestCase):
         self.assertIsNotNone(publication.created_at)
         self.assertIsNotNone(publication.updated_at)
 
-    def test_keywords_are_scoped_per_owner(self):
-        other_keyword = Keyword.objects.create(owner=self.other_user, name="history")
+    def test_keywords_are_global(self):
+        keyword = Keyword.objects.create(name="history")
+        publication = Publication.objects.create(
+            owner=self.owner,
+            title="Archive",
+            content="Body",
+        )
+        publication.keywords.add(keyword)
 
-        self.assertNotEqual(self.keyword.pk, other_keyword.pk)
+        self.assertEqual(keyword.publications.get(), publication)
 
 
 class PublicationViewTests(TestCase):
@@ -56,7 +61,7 @@ class PublicationViewTests(TestCase):
             password="Password123!",
             email="admin@example.com",
         )
-        self.keyword = Keyword.objects.create(owner=self.owner, name="history")
+        self.keyword = Keyword.objects.create(name="history")
         self.publication = Publication.objects.create(
             owner=self.owner,
             title="Family archive",
@@ -91,7 +96,7 @@ class PublicationViewTests(TestCase):
         self.assertEqual(created.owner, self.owner)
         self.assertEqual(created.keywords.get(), self.keyword)
 
-    def test_publication_editor_creates_new_keywords_for_current_user(self):
+    def test_publication_editor_creates_new_global_keywords(self):
         self.client.login(username="owner", password="Password123!")
 
         response = self.client.post(
@@ -112,7 +117,7 @@ class PublicationViewTests(TestCase):
             ["archives", "memoir"],
             transform=lambda value: value,
         )
-        self.assertTrue(Keyword.objects.filter(owner=self.owner, name="memoir").exists())
+        self.assertTrue(Keyword.objects.filter(name="memoir").exists())
 
     def test_owner_can_update_publication(self):
         self.client.login(username="owner", password="Password123!")
@@ -200,7 +205,7 @@ class PublicationViewTests(TestCase):
         self.assertNotContains(response, self.publication.title)
 
     def test_keyword_filter_limits_results(self):
-        other_keyword = Keyword.objects.create(owner=self.owner, name="science")
+        other_keyword = Keyword.objects.create(name="science")
         second_publication = Publication.objects.create(
             owner=self.owner,
             title="Lab notes",
@@ -216,14 +221,14 @@ class PublicationViewTests(TestCase):
         self.assertContains(response, self.publication.title)
         self.assertNotContains(response, "Lab notes")
 
-    def test_keyword_list_is_scoped_to_current_user(self):
-        Keyword.objects.create(owner=self.viewer, name="private-tag")
+    def test_keyword_list_is_shared_between_users(self):
+        Keyword.objects.create(name="private-tag")
         self.client.login(username="owner", password="Password123!")
 
         response = self.client.get(reverse("keyword-list"))
 
         self.assertContains(response, self.keyword.name)
-        self.assertNotContains(response, "private-tag")
+        self.assertContains(response, "private-tag")
 
     def test_publication_download_uses_expected_filename(self):
         self.client.login(username="owner", password="Password123!")

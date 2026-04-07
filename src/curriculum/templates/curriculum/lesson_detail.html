@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lesson.title }} | Curriculum{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h1>{{ lesson.title }}</h1>
+    <p class="meta">Topic: <a href="{% url 'curriculum:curriculum-detail' lesson.topic.curriculum.pk %}">{{ lesson.topic.title }}</a></p>
+    {% if lesson.deadline %}
+      <p class="meta">Deadline: {{ lesson.deadline }}</p>
+    {% endif %}
+    <div class="markdown-output">{{ lesson.rendered_content|safe }}</div>
+    {% if progress %}
+      <p class="meta">Your lesson status: {{ progress.get_status_display }}</p>
+    {% endif %}
+    <div class="actions">
+      {% if progress %}
+        <a class="button-link secondary" href="{% url 'curriculum:lesson-progress-edit' lesson.pk %}">Update progress</a>
+      {% endif %}
+      {% if can_edit_materials %}
+        <a class="button-link" href="{% url 'curriculum:lesson-edit' lesson.pk %}">Edit lesson</a>
+        <a class="button-link secondary" href="{% url 'curriculum:lesson-resource-create' lesson.pk %}">Add resource</a>
+        <a class="button-link secondary" href="{% url 'curriculum:lesson-delete' lesson.pk %}">Delete lesson</a>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="panel" style="margin-top: 1rem;">
+    <h2>Resources</h2>
+    <ul>
+      {% for resource in lesson.resources.all %}
+        <li>
+          <a href="{{ resource.url }}">{{ resource.title }}</a>
+          {% if resource.notes %} - {{ resource.notes }}{% endif %}
+          {% if can_edit_materials %}
+            <a href="{% url 'curriculum:resource-edit' resource.pk %}">Edit</a>
+            <a href="{% url 'curriculum:resource-delete' resource.pk %}">Delete</a>
+          {% endif %}
+        </li>
+      {% empty %}
+        <li>No lesson resources yet.</li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endblock %}
+

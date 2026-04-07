@@ -41,6 +41,13 @@ def env_required(name):
     return value
 
 
+def env_flag(name, default=False):
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
 load_env_file(PROJECT_DIR / ".env")
 
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-c0nbi&q=_1w9eu&!23andp$r5u2f88=(x0=rttf70bmaoz43cq")
@@ -56,6 +63,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "core.apps.CoreConfig",
+    "curriculum.apps.CurriculumConfig",
     "journal.apps.JournalConfig",
     "publications.apps.PublicationsConfig",
 ]
@@ -91,16 +99,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "yourlifestory.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": env_required("POSTGRES_DB"),
-        "USER": env_required("POSTGRES_USER"),
-        "PASSWORD": env_required("POSTGRES_PASSWORD"),
-        "HOST": env_required("POSTGRES_HOST"),
-        "PORT": os.getenv("POSTGRES_PORT", "5432"),
+if env_flag("USE_SQLITE"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": env_required("POSTGRES_DB"),
+            "USER": env_required("POSTGRES_USER"),
+            "PASSWORD": env_required("POSTGRES_PASSWORD"),
+            "HOST": env_required("POSTGRES_HOST"),
+            "PORT": os.getenv("POSTGRES_PORT", "5432"),
+        }
+    }
 
 
 AUTH_PASSWORD_VALIDATORS = [

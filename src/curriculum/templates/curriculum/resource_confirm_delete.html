@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Delete resource | YourLifeStory{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h1>Delete resource</h1>
+    <p>Delete "{{ resource.title }}"?</p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="actions">
+        <button type="submit">Delete</button>
+        {% if resource.lesson %}
+          <a class="button-link secondary" href="{% url 'curriculum:lesson-detail' resource.lesson.pk %}">Cancel</a>
+        {% else %}
+          <a class="button-link secondary" href="{% url 'curriculum:curriculum-detail' resource.curriculum.pk %}">Cancel</a>
+        {% endif %}
+      </div>
+    </form>
+  </section>
+{% endblock %}
+

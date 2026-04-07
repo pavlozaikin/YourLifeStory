@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Curriculums | YourLifeStory{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h1>Curriculums</h1>
+    <p>Structured learning plans you own or can access.</p>
+    <div class="actions">
+      <a class="button-link" href="{% url 'curriculum:curriculum-create' %}">Create curriculum</a>
+    </div>
+  </section>
+
+  <section class="panel" style="margin-top: 1rem;">
+    <ul class="card-list">
+      {% for curriculum in curricula %}
+        <li>
+          <h2><a href="{% url 'curriculum:curriculum-detail' curriculum.pk %}">{{ curriculum.title }}</a></h2>
+          <p class="meta">Code: {{ curriculum.code }} | Visibility: {{ curriculum.get_visibility_display }} | Owner: {{ curriculum.owner.username }}</p>
+          <p>{{ curriculum.goal|truncatechars:180 }}</p>
+        </li>
+      {% empty %}
+        <li>No curriculums yet.</li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endblock %}
+
