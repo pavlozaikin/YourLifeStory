@@ -1,28 +1,63 @@
 {% extends "base.html" %}
 {% block title %}My posts{% endblock %}
-{% block content %}
-<section class="panel">
-  <h2>My posts</h2>
-  <p class="meta">Create posts for authenticated users or publish them publicly.</p>
-  <div class="actions">
-    <a class="button-link" href="{% url 'post-create' %}">Create post</a>
-  </div>
 
+{% block page_header %}
+  <div class="page-header">
+    <p class="eyebrow">Posts</p>
+    <h1 class="page-title">Manage short-form writing for the feed.</h1>
+    <p class="page-subtitle">Posts are the fastest publishing surface in the app. Keep them concise, searchable, and aligned with the audience you choose.</p>
+  </div>
+{% endblock %}
+
+{% block page_actions %}
+  <div class="button-row">
+    <a class="button-link" href="{% url 'post-create' %}">Create post</a>
+    <a class="button-link secondary" href="{% url 'public-feed' %}">Open feed</a>
+  </div>
+{% endblock %}
+
+{% block page_tools %}
   <form method="get" class="filter-row">
     <label>Search <input type="search" name="q" value="{{ request.GET.q }}"></label>
     <button type="submit">Filter</button>
   </form>
+{% endblock %}
 
-  <ul class="card-list">
-    {% for post in posts %}
-      <li>
-        <a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a>
-        <p class="meta">{{ post.get_visibility_display }}</p>
-        <p class="meta">Created {{ post.created_at }} | Updated {{ post.updated_at }}</p>
-      </li>
-    {% empty %}
-      <li>No posts yet.</li>
-    {% endfor %}
-  </ul>
-</section>
+{% block page_aside %}
+  <section class="aside-section">
+    <h3>Post cadence</h3>
+    <p>{{ posts|length }} posts match the current filter. Use visibility to separate public notes from authenticated-only updates.</p>
+  </section>
+  <section class="aside-section">
+    <h3>Publishing tips</h3>
+    <ul>
+      <li>Use Posts for shorter feed-facing updates.</li>
+      <li>Move deeper drafts into Publications when structure matters.</li>
+    </ul>
+  </section>
+{% endblock %}
+
+{% block content %}
+  <section class="surface">
+    <div class="surface-header">
+      <h2>All matching posts</h2>
+      <span class="meta">{{ posts|length }} result{{ posts|length|pluralize }}</span>
+    </div>
+    <ul class="list-stream">
+      {% for post in posts %}
+        <li>
+          <div class="stream-headline">
+            <a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a>
+            <span class="status-pill">{{ post.get_visibility_display }}</span>
+          </div>
+          <p class="meta-cluster">
+            <span>Created {{ post.created_at }}</span>
+            <span>Updated {{ post.updated_at }}</span>
+          </p>
+        </li>
+      {% empty %}
+        <li class="empty-state">No posts match the current filter.</li>
+      {% endfor %}
+    </ul>
+  </section>
 {% endblock %}

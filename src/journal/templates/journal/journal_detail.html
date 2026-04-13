@@ -1,30 +1,65 @@
 {% extends "base.html" %}
 {% block title %}{{ journal.display_title }}{% endblock %}
-{% block content %}
-<section>
-  <h2>{{ journal.display_title }}</h2>
-  <p class="meta">{% if journal.is_personal %}Personal journal{% else %}Custom journal{% endif %}</p>
-  <div class="actions">
+
+{% block page_header %}
+  <div class="page-header">
+    <p class="eyebrow">Journal detail</p>
+    <h1 class="page-title">{{ journal.display_title }}</h1>
+    <p class="page-subtitle">Review entries collected in this journal and move directly into writing, editing, or export flows.</p>
+  </div>
+{% endblock %}
+
+{% block page_actions %}
+  <div class="button-row">
     <a class="button-link" href="{% url 'journal:journal-entry-create' %}?journal={{ journal.pk }}">Create entry in this journal</a>
     {% if not journal.is_personal %}
       <a class="button-link secondary" href="{% url 'journal:journal-edit' journal.pk %}">Edit journal</a>
       <a class="button-link secondary" href="{% url 'journal:journal-delete' journal.pk %}">Delete journal</a>
     {% endif %}
   </div>
-  <ul class="card-list">
-    {% for entry in entries %}
-      <li>
-        <a href="{% url 'journal:journal-entry-detail' entry.pk %}">{{ entry.display_title }}</a>
-        <p class="meta">
-          {{ entry.get_visibility_display }}
-          | Created {{ entry.created_at }}
-          | Updated {{ entry.updated_at }}
-        </p>
-        <p><a href="{% url 'journal:journal-entry-download' entry.pk %}">Download markdown</a></p>
-      </li>
-    {% empty %}
-      <li>No entries in this journal yet.</li>
-    {% endfor %}
-  </ul>
-</section>
+{% endblock %}
+
+{% block page_aside %}
+  <section class="aside-section">
+    <h3>Journal metadata</h3>
+    <ul>
+      <li>Type: {% if journal.is_personal %}Personal journal{% else %}Custom journal{% endif %}</li>
+      <li>Entries in view: {{ entries|length }}</li>
+    </ul>
+  </section>
+  <section class="aside-section">
+    <h3>Navigation</h3>
+    <ul>
+      <li><a class="text-link" href="{% url 'journal:journal-list' %}">Back to journals</a></li>
+      <li><a class="text-link" href="{% url 'journal:journal-entry-create' %}?journal={{ journal.pk }}">Create a new entry</a></li>
+    </ul>
+  </section>
+{% endblock %}
+
+{% block content %}
+  <section class="surface">
+    <div class="surface-header">
+      <h2>Entries in this journal</h2>
+      <span class="meta">{% if journal.is_personal %}Personal journal{% else %}Custom journal{% endif %}</span>
+    </div>
+    <ul class="list-stream">
+      {% for entry in entries %}
+        <li>
+          <div class="stream-headline">
+            <a href="{% url 'journal:journal-entry-detail' entry.pk %}">{{ entry.display_title }}</a>
+            <span class="status-pill">{{ entry.get_visibility_display }}</span>
+          </div>
+          <p class="meta-cluster">
+            <span>Created {{ entry.created_at }}</span>
+            <span>Updated {{ entry.updated_at }}</span>
+          </p>
+          <div class="stream-actions">
+            <a href="{% url 'journal:journal-entry-download' entry.pk %}">Download markdown</a>
+          </div>
+        </li>
+      {% empty %}
+        <li class="empty-state">No entries in this journal yet.</li>
+      {% endfor %}
+    </ul>
+  </section>
 {% endblock %}

@@ -1,33 +1,83 @@
 {% extends "base.html" %}
 {% block title %}{{ entry.display_title }}{% endblock %}
-{% block content %}
-<article>
-  <h2>{{ entry.display_title }}</h2>
-  <p class="meta">Visibility: {{ entry.get_visibility_display }}</p>
-  <p class="meta">Created: {{ entry.created_at }}</p>
-  <p class="meta">Updated: {{ entry.updated_at }}</p>
-  <p class="meta">
-    Journals:
-    {% for journal in entry.journals.all %}
-      <span>{{ journal.display_title }}</span>{% if not forloop.last %}, {% endif %}
-    {% empty %}
-      <span>Personal Journal</span>
-    {% endfor %}
-  </p>
-  {% if entry.shared_with.exists %}
-    <p class="meta">
-      Shared with:
-      {% for user in entry.shared_with.all %}
-        <span>{{ user.username }}</span>{% if not forloop.last %}, {% endif %}
-      {% endfor %}
-    </p>
-  {% endif %}
-  <div>{{ entry.rendered_content }}</div>
-  <div class="actions">
+
+{% block page_header %}
+  <div class="page-header">
+    <p class="eyebrow">Journal entry</p>
+    <h1 class="page-title">{{ entry.display_title }}</h1>
+    <p class="page-subtitle">Inspect where this entry lives, who can access it, and how it connects across your journals.</p>
+  </div>
+{% endblock %}
+
+{% block page_actions %}
+  <div class="button-row">
     <a class="button-link" href="{% url 'journal:journal-entry-edit' entry.pk %}">Edit</a>
     <a class="button-link secondary" href="{% url 'journal:journal-entry-download' entry.pk %}">Download markdown</a>
     <a class="button-link secondary" href="{% url 'journal:journal-entry-delete' entry.pk %}">Delete</a>
   </div>
-  <p><a href="{% url 'journal:journal-list' %}">Back to journals</a></p>
-</article>
+{% endblock %}
+
+{% block page_aside %}
+  <section class="aside-section">
+    <h3>Entry metadata</h3>
+    <ul>
+      <li>Visibility: {{ entry.get_visibility_display }}</li>
+      <li>Created: {{ entry.created_at }}</li>
+      <li>Updated: {{ entry.updated_at }}</li>
+    </ul>
+  </section>
+  <section class="aside-section">
+    <h3>Attached journals</h3>
+    <ul>
+      {% for journal in entry.journals.all %}
+        <li>{{ journal.display_title }}</li>
+      {% empty %}
+        <li>Personal Journal</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% if entry.shared_with.exists %}
+    <section class="aside-section">
+      <h3>Shared with</h3>
+      <ul>
+        {% for user in entry.shared_with.all %}
+          <li>{{ user.username }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <article class="surface">
+    <div class="split-layout">
+      <div class="markdown-output">{{ entry.rendered_content }}</div>
+      <div class="doc-meta">
+        <div class="doc-meta-block">
+          <strong>Visibility</strong>
+          <span>{{ entry.get_visibility_display }}</span>
+        </div>
+        <div class="doc-meta-block">
+          <strong>Journals</strong>
+          <p>
+            {% for journal in entry.journals.all %}
+              {{ journal.display_title }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+              Personal Journal
+            {% endfor %}
+          </p>
+        </div>
+        {% if entry.shared_with.exists %}
+          <div class="doc-meta-block">
+            <strong>Shared with</strong>
+            <p>
+              {% for user in entry.shared_with.all %}
+                {{ user.username }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </article>
 {% endblock %}

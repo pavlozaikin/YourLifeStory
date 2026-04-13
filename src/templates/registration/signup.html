@@ -1,12 +1,40 @@
 {% extends "base.html" %}
 {% block title %}Sign up{% endblock %}
+
+{% block body_class %}auth-shell{% endblock %}
+
+{% block page_header %}
+  <div class="page-header">
+    <p class="eyebrow">Create account</p>
+    <h1 class="page-title">Open a private workspace for your writing and research.</h1>
+    <p class="page-subtitle">Create an account to start keeping journals, writing publications, and managing curriculums inside the protected app shell.</p>
+  </div>
+{% endblock %}
+
+{% block page_aside %}
+  <section class="aside-section">
+    <h3>Included after signup</h3>
+    <ul>
+      <li>A personal journal is created automatically.</li>
+      <li>You can publish feed posts or keep work private.</li>
+      <li>Admins still control whether self-signup is enabled.</li>
+    </ul>
+  </section>
+{% endblock %}
+
 {% block content %}
-<h2>Create your account</h2>
-<p class="meta">Self-signup is controlled by admins in the Django admin panel.</p>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Create account</button>
-</form>
-<p><a href="{% url 'login' %}">Already have an account?</a></p>
+  <section class="surface">
+    <div class="surface-header">
+      <h2>Create your account</h2>
+      <span class="meta">Private-first setup</span>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="actions">
+        <button type="submit">Create account</button>
+        <a class="button-link secondary" href="{% url 'login' %}">Already have an account?</a>
+      </div>
+    </form>
+  </section>
 {% endblock %}

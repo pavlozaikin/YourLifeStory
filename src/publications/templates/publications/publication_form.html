@@ -1,49 +1,82 @@
 {% extends "base.html" %}
 {% block title %}{% if object %}Edit publication{% else %}Create publication{% endif %}{% endblock %}
+
+{% block page_header %}
+  <div class="page-header">
+    <p class="eyebrow">Publication editor</p>
+    <h1 class="page-title">{% if object %}Refine this publication before it is shared or exported.{% else %}Draft a publication with visibility, status, and keyword structure.{% endif %}</h1>
+    <p class="page-subtitle">This editor is for durable writing. Keep taxonomy and status current so the library stays easy to scan later.</p>
+  </div>
+{% endblock %}
+
+{% block page_actions %}
+  <div class="button-row">
+    {% if object %}
+      <a class="button-link secondary" href="{% url 'publication-download' object.pk %}">Download markdown</a>
+      <a class="button-link secondary" href="{% url 'publication-detail' object.pk %}">View publication</a>
+    {% endif %}
+    <a class="button-link secondary" href="{% url 'my-publications' %}">Back to publications</a>
+  </div>
+{% endblock %}
+
+{% block page_aside %}
+  <section class="aside-section">
+    <h3>Editor state</h3>
+    <ul>
+      <li>Created: {% if object %}{{ object.created_at }}{% else %}Not saved yet{% endif %}</li>
+      <li>Updated: {% if object %}{{ object.updated_at }}{% else %}Not saved yet{% endif %}</li>
+    </ul>
+  </section>
+  <section class="aside-section">
+    <h3>Keyword workflow</h3>
+    <p>Reuse shared keywords where possible, then add new ones inline only when the existing taxonomy does not fit.</p>
+  </section>
+{% endblock %}
+
 {% block content %}
-<section class="panel">
-  <h2>{% if object %}Edit{% else %}Create{% endif %} publication</h2>
-  <p class="meta">Created: {% if object %}{{ object.created_at }}{% else %}-{% endif %}</p>
-  <p class="meta">Updated: {% if object %}{{ object.updated_at }}{% else %}-{% endif %}</p>
-  {% if object %}
-    <p><a href="{% url 'publication-download' object.pk %}">Download markdown</a></p>
-  {% endif %}
-  <form method="post">
-    {% csrf_token %}
-    <p>
-      <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
-      {{ form.title }}
-      {{ form.title.errors }}
-    </p>
-    <p>
-      <label for="{{ form.content.id_for_label }}">{{ form.content.label }}</label>
-      {% include "shared/markdown_editor.html" with field=form.content %}
-      {{ form.content.errors }}
-    </p>
-    <p>
-      <label for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
-      {{ form.status }}
-      {{ form.status.errors }}
-    </p>
-    <p>
-      <label for="{{ form.visibility.id_for_label }}">{{ form.visibility.label }}</label>
-      {{ form.visibility }}
-      {{ form.visibility.errors }}
-    </p>
-    <fieldset>
-      <legend>Existing keywords</legend>
-      <p class="meta">Select keywords from the shared keyword library or create more below.</p>
-      {{ form.keywords.errors }}
-      {{ form.keywords }}
-    </fieldset>
-    <p>
-      <label for="{{ form.new_keywords.id_for_label }}">{{ form.new_keywords.label }}</label>
-      {{ form.new_keywords }}
-      {% if form.new_keywords.help_text %}<span class="meta">{{ form.new_keywords.help_text }}</span>{% endif %}
-      {{ form.new_keywords.errors }}
-    </p>
-    <button type="submit">Save</button>
-  </form>
-  <p><a href="{% url 'my-publications' %}">Back to my publications</a></p>
-</section>
+  <section class="surface">
+    <div class="surface-header">
+      <h2>{% if object %}Edit publication{% else %}Create publication{% endif %}</h2>
+      <span class="meta">Long-form document</span>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      <p>
+        <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+        {{ form.title }}
+        {{ form.title.errors }}
+      </p>
+      <p>
+        <label for="{{ form.content.id_for_label }}">{{ form.content.label }}</label>
+        {% include "shared/markdown_editor.html" with field=form.content %}
+        {{ form.content.errors }}
+      </p>
+      <p>
+        <label for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
+        {{ form.status }}
+        {{ form.status.errors }}
+      </p>
+      <p>
+        <label for="{{ form.visibility.id_for_label }}">{{ form.visibility.label }}</label>
+        {{ form.visibility }}
+        {{ form.visibility.errors }}
+      </p>
+      <fieldset>
+        <legend>Existing keywords</legend>
+        <p class="form-hint">Select from the shared keyword library or create more below.</p>
+        {{ form.keywords.errors }}
+        {{ form.keywords }}
+      </fieldset>
+      <p>
+        <label for="{{ form.new_keywords.id_for_label }}">{{ form.new_keywords.label }}</label>
+        {{ form.new_keywords }}
+        {% if form.new_keywords.help_text %}<span class="form-hint">{{ form.new_keywords.help_text }}</span>{% endif %}
+        {{ form.new_keywords.errors }}
+      </p>
+      <div class="actions">
+        <button type="submit">Save</button>
+        <a class="button-link secondary" href="{% url 'my-publications' %}">Cancel</a>
+      </div>
+    </form>
+  </section>
 {% endblock %}

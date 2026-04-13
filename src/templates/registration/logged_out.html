@@ -1,7 +1,33 @@
 {% extends "base.html" %}
 {% block title %}Logged out{% endblock %}
+
+{% block body_class %}auth-shell{% endblock %}
+
+{% block page_header %}
+  <div class="page-header">
+    <p class="eyebrow">Session closed</p>
+    <h1 class="page-title">You have been signed out of the workspace.</h1>
+    <p class="page-subtitle">Public feed items remain readable, and you can return to the protected areas whenever you need them again.</p>
+  </div>
+{% endblock %}
+
+{% block page_aside %}
+  <section class="aside-section">
+    <h3>Available now</h3>
+    <p>You can continue browsing the public feed or sign back in to reopen your private materials.</p>
+  </section>
+{% endblock %}
+
 {% block content %}
-<h2>Logged out</h2>
-<p>You have been signed out.</p>
-<p><a href="{% url 'login' %}">Login again</a></p>
+  <section class="surface">
+    <div class="surface-header">
+      <h2>Logged out</h2>
+      <span class="meta">Session ended</span>
+    </div>
+    <p class="surface-intro">Your protected session has ended successfully.</p>
+    <div class="actions">
+      <a class="button-link" href="{% url 'login' %}">Login again</a>
+      <a class="button-link secondary" href="{% url 'public-feed' %}">Open public feed</a>
+    </div>
+  </section>
 {% endblock %}

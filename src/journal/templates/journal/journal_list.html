@@ -1,33 +1,61 @@
 {% extends "base.html" %}
 {% block title %}Journals{% endblock %}
-{% block content %}
-<section>
-  <h2>Your journals</h2>
-  <p class="meta">Every account gets a Personal Journal automatically. You can create more journals for different collections of entries.</p>
-  <div class="actions">
+
+{% block page_header %}
+  <div class="page-header">
+    <p class="eyebrow">Journal</p>
+    <h1 class="page-title">Keep private capture organized by journal and entry.</h1>
+    <p class="page-subtitle">Each account includes a personal journal by default, and you can add more collections for separate lines of thought.</p>
+  </div>
+{% endblock %}
+
+{% block page_actions %}
+  <div class="button-row">
     <a class="button-link" href="{% url 'journal:journal-create' %}">Create journal</a>
     <a class="button-link secondary" href="{% url 'journal:journal-entry-create' %}">Create entry</a>
   </div>
-  <ul class="card-list">
-    {% for journal in journals %}
-      <li>
-        <h3>
-          <a href="{% url 'journal:journal-detail' journal.pk %}">{{ journal.display_title }}</a>
-        </h3>
-        <p class="meta">
-          {% if journal.is_personal %}Personal journal{% else %}Custom journal{% endif %}
-          | {{ journal.entries.count }} entries
-        </p>
-        {% if not journal.is_personal %}
-          <p>
-            <a href="{% url 'journal:journal-edit' journal.pk %}">Edit</a>
-            <a href="{% url 'journal:journal-delete' journal.pk %}">Delete</a>
+{% endblock %}
+
+{% block page_aside %}
+  <section class="aside-section">
+    <h3>Journal system</h3>
+    <p>{{ journals|length }} journal{{ journals|length|pluralize }} available in your workspace, including the personal default journal.</p>
+  </section>
+  <section class="aside-section">
+    <h3>Usage</h3>
+    <ul>
+      <li>Use journals to separate collections of entries.</li>
+      <li>Attach one entry to multiple journals when themes overlap.</li>
+    </ul>
+  </section>
+{% endblock %}
+
+{% block content %}
+  <section class="surface">
+    <div class="surface-header">
+      <h2>Your journals</h2>
+      <span class="meta">Private-first entry collections</span>
+    </div>
+    <ul class="list-stream">
+      {% for journal in journals %}
+        <li>
+          <div class="stream-headline">
+            <a href="{% url 'journal:journal-detail' journal.pk %}">{{ journal.display_title }}</a>
+            <span class="status-pill">{% if journal.is_personal %}Personal{% else %}Custom{% endif %}</span>
+          </div>
+          <p class="meta-cluster">
+            <span>{{ journal.entries.count }} entr{{ journal.entries.count|pluralize:"y,ies" }}</span>
           </p>
-        {% endif %}
-      </li>
-    {% empty %}
-      <li>No journals yet.</li>
-    {% endfor %}
-  </ul>
-</section>
+          {% if not journal.is_personal %}
+            <div class="stream-actions">
+              <a href="{% url 'journal:journal-edit' journal.pk %}">Edit</a>
+              <a href="{% url 'journal:journal-delete' journal.pk %}">Delete</a>
+            </div>
+          {% endif %}
+        </li>
+      {% empty %}
+        <li class="empty-state">No journals exist yet.</li>
+      {% endfor %}
+    </ul>
+  </section>
 {% endblock %}

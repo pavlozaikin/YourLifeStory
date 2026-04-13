@@ -1,14 +1,42 @@
 {% extends "base.html" %}
 {% block title %}Login{% endblock %}
+
+{% block body_class %}auth-shell{% endblock %}
+
+{% block page_header %}
+  <div class="page-header">
+    <p class="eyebrow">Access</p>
+    <h1 class="page-title">Return to your protected workspace.</h1>
+    <p class="page-subtitle">Sign in to reopen journals, study plans, drafts, and authenticated feed items.</p>
+  </div>
+{% endblock %}
+
+{% block page_aside %}
+  <section class="aside-section">
+    <h3>What opens after login</h3>
+    <ul>
+      <li>Private journals and entry history</li>
+      <li>Personal publications and posts</li>
+      <li>Curriculum progress and member-only materials</li>
+    </ul>
+  </section>
+{% endblock %}
+
 {% block content %}
-<h2>Login</h2>
-<p class="meta">Access your protected content with your username and password.</p>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Login</button>
-</form>
-{% if site_settings.self_signup_enabled %}
-  <p><a href="{% url 'signup' %}">Create an account</a></p>
-{% endif %}
+  <section class="surface">
+    <div class="surface-header">
+      <h2>Login</h2>
+      <span class="meta">Protected access</span>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <div class="actions">
+        <button type="submit">Login</button>
+        {% if site_settings.self_signup_enabled %}
+          <a class="button-link secondary" href="{% url 'signup' %}">Create an account</a>
+        {% endif %}
+      </div>
+    </form>
+  </section>
 {% endblock %}

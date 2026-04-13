@@ -1,19 +1,65 @@
 {% extends "base.html" %}
 {% load core_markdown %}
 {% block title %}{{ post.title }}{% endblock %}
-{% block content %}
-<article class="panel">
-  <h2>{{ post.title }}</h2>
-  <p class="meta">By {{ post.owner.username }}</p>
-  <p class="meta">Visibility: {{ post.get_visibility_display }}</p>
-  <p class="meta">Created: {{ post.created_at }}</p>
-  <p class="meta">Updated: {{ post.updated_at }}</p>
-  <div class="markdown-output">{{ post.content|markdown }}</div>
-  <div class="actions">
+
+{% block page_header %}
+  <div class="page-header">
+    <p class="eyebrow">Post detail</p>
+    <h1 class="page-title">{{ post.title }}</h1>
+    <p class="page-subtitle">Review the published surface, visibility, and timestamps before you edit or remove this post.</p>
+  </div>
+{% endblock %}
+
+{% block page_actions %}
+  <div class="button-row">
     {% if can_edit %}
       <a class="button-link" href="{% url 'post-edit' post.pk %}">Edit</a>
       <a class="button-link secondary" href="{% url 'post-delete' post.pk %}">Delete</a>
     {% endif %}
+    <a class="button-link secondary" href="{% url 'post-list' %}">Back to posts</a>
   </div>
-</article>
+{% endblock %}
+
+{% block page_aside %}
+  <section class="aside-section">
+    <h3>Post metadata</h3>
+    <ul>
+      <li>Author: {{ post.owner.username }}</li>
+      <li>Visibility: {{ post.get_visibility_display }}</li>
+      <li>Created: {{ post.created_at }}</li>
+      <li>Updated: {{ post.updated_at }}</li>
+    </ul>
+  </section>
+  <section class="aside-section">
+    <h3>Navigation</h3>
+    <ul>
+      <li><a class="text-link" href="{% url 'public-feed' %}">Open feed</a></li>
+      <li><a class="text-link" href="{% url 'post-list' %}">Return to all posts</a></li>
+    </ul>
+  </section>
+{% endblock %}
+
+{% block content %}
+  <article class="surface">
+    <div class="split-layout">
+      <div>
+        <div class="markdown-output">{{ post.content|markdown }}</div>
+      </div>
+      <div class="doc-meta">
+        <div class="doc-meta-block">
+          <strong>Visibility</strong>
+          <span>{{ post.get_visibility_display }}</span>
+        </div>
+        <div class="doc-meta-block">
+          <strong>Owner</strong>
+          <span>{{ post.owner.username }}</span>
+        </div>
+        <div class="doc-meta-block">
+          <strong>Timeline</strong>
+          <p>{{ post.created_at }} created</p>
+          <p>{{ post.updated_at }} updated</p>
+        </div>
+      </div>
+    </div>
+  </article>
 {% endblock %}

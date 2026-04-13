@@ -2,42 +2,117 @@
 
 {% block title %}Workspace | YourLifeStory{% endblock %}
 
+{% block page_header %}
+  <div class="page-header">
+    <p class="eyebrow">Workspace</p>
+    <h1 class="page-title">Your workspace, organized around writing and learning.</h1>
+    <p class="page-subtitle">Jump between curriculums, publications, posts, and journals without losing the thread of what needs attention next.</p>
+  </div>
+{% endblock %}
+
+{% block page_actions %}
+  <div class="button-row">
+    <a class="button-link" href="{% url 'post-create' %}">Write post</a>
+    <a class="button-link secondary" href="{% url 'publication-create' %}">Create publication</a>
+    <a class="button-link secondary" href="{% url 'journal:journal-entry-create' %}">New journal entry</a>
+  </div>
+{% endblock %}
+
+{% block page_aside %}
+  <section class="aside-section">
+    <h3>Signed in</h3>
+    <p>{{ request.user.username }} is in the protected workspace. Public items can still be reviewed from the feed without leaving this shell.</p>
+  </section>
+  <section class="aside-section">
+    <h3>Recommended flow</h3>
+    <ul>
+      <li>Capture daily thinking in Journal.</li>
+      <li>Promote mature notes into Publications.</li>
+      <li>Use Posts for shorter feed-facing updates.</li>
+      <li>Keep learning plans active in Curriculums.</li>
+    </ul>
+  </section>
+  <section class="aside-section">
+    <h3>Privacy model</h3>
+    <p>Drafts, journals, and non-public records remain session-protected. Only explicitly public items appear in the feed.</p>
+  </section>
+{% endblock %}
+
 {% block content %}
-  <section class="panel">
-    <h1>Your workspace</h1>
-    <p>This protected area is ready for authenticated modules such as Publications and Journal.</p>
-    <p class="meta">Signed in as {{ request.user.username }}.</p>
+  <section class="surface">
+    <div class="surface-header">
+      <h2>Selected areas</h2>
+      <span class="meta-pill">4 modules</span>
+    </div>
+    <div class="module-grid">
+      <div class="mini-panel">
+        <strong>Curriculums</strong>
+        <p>Structure topics, lessons, and study progress.</p>
+        <div class="inline-links">
+          <a href="{% url 'curriculum:curriculum-list' %}">Open curriculums</a>
+        </div>
+      </div>
+      <div class="mini-panel">
+        <strong>Publications</strong>
+        <p>Develop longer pieces with visibility and keyword control.</p>
+        <div class="inline-links">
+          <a href="{% url 'my-publications' %}">Open publications</a>
+        </div>
+      </div>
+      <div class="mini-panel">
+        <strong>Posts</strong>
+        <p>Publish shorter notes to readers and collaborators.</p>
+        <div class="inline-links">
+          <a href="{% url 'post-list' %}">Open posts</a>
+        </div>
+      </div>
+      <div class="mini-panel">
+        <strong>Journal</strong>
+        <p>Keep private entries and organize them by journal.</p>
+        <div class="inline-links">
+          <a href="{% url 'journal:journal-list' %}">Open journal</a>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <section class="panel" style="margin-top: 1rem;">
-    <h2>Modules</h2>
-    <ul class="card-list">
+  <section class="surface">
+    <div class="surface-header">
+      <h2>Next actions</h2>
+      <span class="meta">Move quickly between the most common creation flows.</span>
+    </div>
+    <ul class="list-stream">
       <li>
-        <h3>Curriculums</h3>
-        <p class="meta">Build private-first learning plans with topics, lessons, resources, roles, and progress tracking.</p>
-        <div class="actions">
-          <a class="button-link" href="{% url 'curriculum:curriculum-list' %}">Open curriculums</a>
+        <div class="stream-headline">
+          <strong>Start a fresh publication</strong>
+          <span class="status-pill">Long-form</span>
+        </div>
+        <p class="stream-copy">Use publications when a note needs structured keywords, status tracking, and markdown export.</p>
+        <div class="stream-actions">
+          <a href="{% url 'publication-create' %}">Create publication</a>
+          <a href="{% url 'keyword-list' %}">Review keywords</a>
         </div>
       </li>
       <li>
-        <h3>Publications</h3>
-        <p class="meta">Write structured publications with keywords, visibility, and public feed support.</p>
-        <div class="actions">
-          <a class="button-link" href="{% url 'my-publications' %}">Open publications</a>
+        <div class="stream-headline">
+          <strong>Capture a private entry</strong>
+          <span class="status-pill">Journal</span>
+        </div>
+        <p class="stream-copy">Write directly into your personal journals and keep sensitive thoughts out of the feed.</p>
+        <div class="stream-actions">
+          <a href="{% url 'journal:journal-entry-create' %}">New journal entry</a>
+          <a href="{% url 'journal:journal-list' %}">Browse journals</a>
         </div>
       </li>
       <li>
-        <h3>Posts</h3>
-        <p class="meta">Write feed posts for authenticated readers or publish them publicly.</p>
-        <div class="actions">
-          <a class="button-link" href="{% url 'post-list' %}">Open posts</a>
+        <div class="stream-headline">
+          <strong>Post an update</strong>
+          <span class="status-pill">Feed</span>
         </div>
-      </li>
-      <li>
-        <h3>Journal</h3>
-        <p class="meta">Keep private day-to-day journal entries in your personal journal workspace.</p>
-        <div class="actions">
-          <a class="button-link" href="{% url 'journal:journal-list' %}">Open journal</a>
+        <p class="stream-copy">Use posts for short updates that belong in the shared reading stream.</p>
+        <div class="stream-actions">
+          <a href="{% url 'post-create' %}">Write post</a>
+          <a href="{% url 'public-feed' %}">View feed</a>
         </div>
       </li>
     </ul>

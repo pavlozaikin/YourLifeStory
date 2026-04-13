@@ -7,157 +7,674 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f7f4ed;
-      --panel: #fffdfa;
-      --ink: #1f2933;
-      --muted: #52606d;
-      --accent: #8d5a2b;
-      --accent-soft: #eadbc8;
-      --border: #d9c8b4;
+      --bg: #f4efe7;
+      --bg-deep: #e7ded1;
+      --surface: rgba(255, 252, 247, 0.86);
+      --surface-strong: #fffdfa;
+      --surface-soft: rgba(255, 255, 255, 0.55);
+      --line: rgba(34, 48, 61, 0.12);
+      --line-strong: rgba(34, 48, 61, 0.2);
+      --ink: #18212b;
+      --muted: #5f6a73;
+      --accent: #245d6a;
+      --accent-strong: #194550;
+      --accent-soft: rgba(36, 93, 106, 0.1);
+      --warm: #986d42;
+      --shadow: 0 24px 50px rgba(42, 34, 24, 0.08);
+      --radius-lg: 28px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --sidebar-width: 17.5rem;
+      --aside-width: 18rem;
     }
 
     * {
       box-sizing: border-box;
     }
 
+    html {
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(152, 109, 66, 0.14), transparent 32%),
+        radial-gradient(circle at top right, rgba(36, 93, 106, 0.1), transparent 28%),
+        linear-gradient(180deg, #f8f4ee 0%, var(--bg) 48%, var(--bg-deep) 100%);
+    }
+
     body {
       margin: 0;
-      font-family: Georgia, "Times New Roman", serif;
-      background: linear-gradient(180deg, #f2ebdf 0%, var(--bg) 100%);
+      min-height: 100vh;
+      font-family: "Inter", "Segoe UI", sans-serif;
       color: var(--ink);
+      background: transparent;
+    }
+
+    body.nav-open {
+      overflow: hidden;
     }
 
     a {
-      color: var(--accent);
+      color: inherit;
     }
 
-    .shell {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 1.5rem;
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
     }
 
-    header,
-    main,
-    footer {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 1.25rem;
-      box-shadow: 0 14px 32px rgba(93, 64, 32, 0.08);
+    .app-shell {
+      min-height: 100vh;
+      padding: 1rem;
     }
 
-    header {
-      margin-top: 1.5rem;
+    .app-grid {
+      display: grid;
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr) var(--aside-width);
+      gap: 1rem;
+      align-items: start;
+      min-height: calc(100vh - 2rem);
     }
 
-    main {
-      margin-top: 1rem;
-      margin-bottom: 1rem;
+    .mobile-bar {
+      display: none;
     }
 
-    nav {
+    .sidebar-backdrop {
+      display: none;
+    }
+
+    .app-sidebar,
+    .app-main,
+    .app-aside {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .app-sidebar,
+    .app-aside {
+      position: sticky;
+      top: 1rem;
+      min-height: calc(100vh - 2rem);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .app-sidebar {
+      padding: 1.4rem 1.15rem 1.2rem;
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem 1rem;
-      margin-top: 0.75rem;
-      align-items: center;
+      flex-direction: column;
+      gap: 1.25rem;
     }
 
-    nav a,
-    nav span {
+    .brand-mark {
+      display: grid;
+      gap: 0.55rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand-kicker {
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .brand-link {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.65rem, 2vw, 2.1rem);
+      font-weight: 700;
+      line-height: 1;
       text-decoration: none;
       color: var(--ink);
     }
 
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      margin: 1rem 0;
-    }
-
-    .card-list {
-      list-style: none;
-      padding: 0;
-      display: grid;
-      gap: 1rem;
-    }
-
-    .card-list li {
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1rem;
-      background: #fff;
-    }
-
-    .panel {
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1rem;
-      background: #fff;
-    }
-
-    .meta {
+    .brand-copy {
+      margin: 0;
       color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.94rem;
+    }
+
+    .nav-group {
+      display: grid;
+      gap: 0.65rem;
+    }
+
+    .nav-group-title {
+      margin: 0;
+      font-size: 0.74rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .nav-list {
+      display: grid;
+      gap: 0.28rem;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      padding: 0.8rem 0.9rem;
+      border-radius: 14px;
+      text-decoration: none;
+      color: var(--muted);
+      transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus-visible {
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--ink);
+      transform: translateX(2px);
+      outline: none;
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, rgba(36, 93, 106, 0.14), rgba(255, 255, 255, 0.78));
+      color: var(--ink);
+      box-shadow: inset 0 0 0 1px rgba(36, 93, 106, 0.14);
+    }
+
+    .nav-link strong {
+      font-size: 0.96rem;
+      font-weight: 600;
+    }
+
+    .nav-link span {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      display: grid;
+      gap: 0.9rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .account-chip,
+    .aside-note,
+    .mini-panel {
+      padding: 0.95rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .account-chip strong,
+    .aside-note strong,
+    .mini-panel strong {
+      display: block;
+      margin-bottom: 0.25rem;
       font-size: 0.95rem;
     }
 
-    .messages {
-      list-style: none;
-      padding: 0;
-    }
-
-    .messages li {
-      background: var(--accent-soft);
-      border-radius: 10px;
-      padding: 0.75rem;
-      margin-bottom: 0.75rem;
-    }
-
-    form p {
-      margin-bottom: 1rem;
-    }
-
-    input,
-    select,
-    textarea,
-    button {
-      font: inherit;
-    }
-
-    button,
-    .button-link {
-      border: 1px solid var(--accent);
-      background: var(--accent);
-      color: #fff;
-      border-radius: 999px;
-      padding: 0.55rem 1rem;
-      text-decoration: none;
-      cursor: pointer;
-    }
-
-    .button-link.secondary,
-    button.secondary {
-      background: transparent;
-      color: var(--accent);
-    }
-
-    .filter-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      align-items: end;
-      margin-bottom: 1rem;
+    .account-chip p,
+    .aside-note p,
+    .mini-panel p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.9rem;
     }
 
     .logout-form {
       margin: 0;
     }
 
-    .username-link {
-      font-weight: 700;
+    .app-main {
+      min-height: calc(100vh - 2rem);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.35rem 1.6rem;
+      display: grid;
+      gap: 1rem;
+      animation: rise-in 420ms ease;
+    }
+
+    .page-intro {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .page-header {
+      display: grid;
+      gap: 0.6rem;
+      padding: 0.15rem 0 0.1rem;
+    }
+
+    .eyebrow {
+      margin: 0;
+      font-size: 0.74rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .page-title {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      line-height: 0.96;
+      letter-spacing: -0.03em;
+      max-width: 12ch;
+    }
+
+    .page-subtitle {
+      margin: 0;
+      max-width: 42rem;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 1rem;
+    }
+
+    .button-row,
+    .actions,
+    .toolbar-row,
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .toolbar-row,
+    .filter-row,
+    .messages,
+    .surface,
+    .panel {
+      animation: float-in 380ms ease;
+    }
+
+    .button-link,
+    button,
+    input[type="submit"] {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      min-height: 2.8rem;
+      padding: 0.75rem 1.1rem;
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: #fff;
       text-decoration: none;
+      cursor: pointer;
+      transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+    }
+
+    .button-link:hover,
+    .button-link:focus-visible,
+    button:hover,
+    button:focus-visible,
+    input[type="submit"]:hover,
+    input[type="submit"]:focus-visible {
+      transform: translateY(-1px);
+      background: var(--accent-strong);
+      border-color: var(--accent-strong);
+      outline: none;
+    }
+
+    .button-link.secondary,
+    button.secondary {
+      background: transparent;
+      color: var(--accent);
+      border-color: rgba(36, 93, 106, 0.25);
+    }
+
+    .button-link.secondary:hover,
+    .button-link.secondary:focus-visible,
+    button.secondary:hover,
+    button.secondary:focus-visible {
+      background: var(--accent-soft);
+      border-color: rgba(36, 93, 106, 0.32);
+      color: var(--accent-strong);
+    }
+
+    .toolbar-row,
+    .filter-row {
+      padding: 0.9rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .filter-row label {
+      display: grid;
+      gap: 0.45rem;
+      min-width: min(16rem, 100%);
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .content-stack {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .surface,
+    .panel {
+      padding: 1.25rem;
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius-lg) - 4px);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 252, 247, 0.94));
+    }
+
+    .surface-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .surface-header h2,
+    .surface-header h3,
+    .surface h2,
+    .surface h3,
+    .panel h2,
+    .panel h3 {
+      margin: 0;
+      font-size: 1.15rem;
+      line-height: 1.3;
+    }
+
+    .surface-intro {
+      margin: 0 0 1rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .kpi-grid,
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+      gap: 0.9rem;
+    }
+
+    .metric {
+      padding: 0.95rem 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .metric:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .metric-value {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 1.75rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .metric-label,
+    .metric-copy,
+    .meta {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .meta-cluster {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem 0.75rem;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .meta-pill,
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 999px;
+      background: rgba(36, 93, 106, 0.08);
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .list-stream,
+    .card-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0;
+    }
+
+    .list-stream > li,
+    .card-list > li,
+    .stream-item {
+      padding: 1rem 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .list-stream > li:first-child,
+    .card-list > li:first-child,
+    .stream-item:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .stream-headline {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.8rem;
+      align-items: baseline;
+      margin-bottom: 0.45rem;
+    }
+
+    .stream-headline a,
+    .stream-headline strong,
+    .doc-title a,
+    .doc-title {
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .stream-copy,
+    .doc-summary {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .stream-actions,
+    .inline-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      margin-top: 0.75rem;
+    }
+
+    .stream-actions a,
+    .inline-links a,
+    .text-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .stream-actions a:hover,
+    .inline-links a:hover,
+    .text-link:hover {
+      color: var(--accent-strong);
+    }
+
+    .split-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(15rem, 0.8fr);
+      gap: 1.1rem;
+      align-items: start;
+    }
+
+    .doc-meta {
+      display: grid;
+      gap: 0.7rem;
+      padding-left: 1rem;
+      border-left: 1px solid var(--line);
+    }
+
+    .doc-meta-block {
+      display: grid;
+      gap: 0.25rem;
+    }
+
+    .doc-meta-block strong {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .doc-meta-block span,
+    .doc-meta-block p {
+      margin: 0;
+      line-height: 1.55;
+      color: var(--ink);
+    }
+
+    .empty-state {
+      padding: 1rem 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .app-aside {
+      padding: 1rem;
+      display: grid;
+      gap: 0.85rem;
+      animation: float-in 420ms ease;
+    }
+
+    .aside-section {
+      padding: 1rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    .aside-section h3,
+    .aside-section h4 {
+      margin: 0 0 0.45rem;
+      font-size: 0.95rem;
+    }
+
+    .aside-section p,
+    .aside-section ul {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 0.92rem;
+    }
+
+    .aside-section ul {
+      list-style: none;
+      padding: 0;
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .messages {
+      list-style: none;
+      padding: 0.2rem 0 0;
+      margin: 0;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .messages li {
+      padding: 0.95rem 1rem;
+      border: 1px solid rgba(36, 93, 106, 0.16);
+      border-radius: var(--radius-md);
+      background: rgba(36, 93, 106, 0.08);
+      color: var(--ink);
+    }
+
+    form {
+      display: grid;
+      gap: 1rem;
+    }
+
+    form p,
+    fieldset {
+      margin: 0;
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    label,
+    legend {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    input[type="search"],
+    input[type="password"],
+    input[type="email"],
+    input[type="date"],
+    input[type="datetime-local"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      min-height: 2.9rem;
+      padding: 0.8rem 0.9rem;
+      border: 1px solid var(--line-strong);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--ink);
+      transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+    }
+
+    textarea {
+      min-height: 9rem;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: rgba(36, 93, 106, 0.45);
+      box-shadow: 0 0 0 4px rgba(36, 93, 106, 0.08);
+      background: #fff;
+    }
+
+    fieldset {
+      padding: 1rem;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    ul.errorlist {
+      margin: 0;
+      padding-left: 1.15rem;
+      color: #8b1e28;
     }
 
     .markdown-editor {
@@ -172,11 +689,18 @@
     }
 
     .markdown-toolbar button {
+      min-height: auto;
+      padding: 0.45rem 0.75rem;
       border-radius: 999px;
-      padding: 0.35rem 0.8rem;
-      background: #fff;
+      background: rgba(255, 255, 255, 0.82);
       color: var(--accent);
-      border: 1px solid var(--border);
+      border: 1px solid var(--line);
+    }
+
+    .markdown-toolbar button:hover,
+    .markdown-toolbar button:focus-visible {
+      background: var(--accent-soft);
+      border-color: rgba(36, 93, 106, 0.18);
     }
 
     .markdown-editor-input {
@@ -186,13 +710,22 @@
     }
 
     .markdown-output {
-      line-height: 1.6;
+      line-height: 1.78;
+      color: var(--ink);
+    }
+
+    .markdown-output > *:first-child {
+      margin-top: 0;
+    }
+
+    .markdown-output > *:last-child {
+      margin-bottom: 0;
     }
 
     .markdown-output blockquote {
       margin: 1rem 0;
       padding-left: 1rem;
-      border-left: 4px solid var(--border);
+      border-left: 3px solid rgba(36, 93, 106, 0.22);
       color: var(--muted);
     }
 
@@ -202,61 +735,383 @@
     }
 
     .markdown-output pre {
-      background: #f3ede4;
-      padding: 0.75rem;
-      border-radius: 12px;
+      padding: 0.95rem;
+      border-radius: 14px;
       overflow-x: auto;
+      background: #efe7dc;
+    }
+
+    .form-hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .auth-shell .page-title {
+      max-width: 10ch;
+    }
+
+    .auth-shell .app-main {
+      max-width: 56rem;
+    }
+
+    .public-shell .page-title {
+      max-width: 14ch;
+    }
+
+    @media (max-width: 1180px) {
+      .app-grid {
+        grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+      }
+
+      .app-aside {
+        display: none;
+      }
+    }
+
+    @media (max-width: 920px) {
+      .app-shell {
+        padding: 0.75rem;
+      }
+
+      .app-grid {
+        grid-template-columns: minmax(0, 1fr);
+        min-height: calc(100vh - 1.5rem);
+      }
+
+      .mobile-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .mobile-brand {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 1.25rem;
+        font-weight: 700;
+        text-decoration: none;
+        color: var(--ink);
+      }
+
+      .nav-toggle {
+        min-height: auto;
+        padding: 0.7rem 0.95rem;
+      }
+
+      .sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(24, 33, 43, 0.32);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 180ms ease;
+        display: block;
+        z-index: 19;
+      }
+
+      body.nav-open .sidebar-backdrop {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .app-sidebar {
+        position: fixed;
+        top: 0.75rem;
+        left: 0.75rem;
+        bottom: 0.75rem;
+        width: min(21rem, calc(100vw - 1.5rem));
+        min-height: auto;
+        transform: translateX(calc(-100% - 1rem));
+        transition: transform 220ms ease;
+        z-index: 20;
+      }
+
+      body.nav-open .app-sidebar {
+        transform: translateX(0);
+      }
+
+      .app-main {
+        min-height: calc(100vh - 1.5rem);
+        padding: 1rem;
+      }
+
+      .split-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .doc-meta {
+        padding-left: 0;
+        padding-top: 1rem;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .page-title {
+        font-size: clamp(1.9rem, 10vw, 2.65rem);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    @keyframes rise-in {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes float-in {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
-<body>
-  <div class="shell">
-    <header>
-      <h1><a href="{% url 'public-feed' %}">YourLifeStory</a></h1>
-      <p class="meta">A local-first web hub for personal research and writing.</p>
-      <nav>
-        <a href="{% url 'public-feed' %}">Public feed</a>
-        {% if request.user.is_authenticated %}
-          <a href="{% url 'curriculum:curriculum-list' %}">Curriculums</a>
-          <a href="{% url 'my-publications' %}">My publications</a>
-          <a href="{% url 'post-list' %}">My posts</a>
-          <a href="{% url 'journal:journal-list' %}">Journal</a>
-          <a href="{% url 'keyword-list' %}">Keywords</a>
-          {% if request.user.is_staff %}
-            <a href="{% url 'publication-all' %}">All publications</a>
-            <a href="{% url 'admin:index' %}">Admin</a>
+<body class="{% block body_class %}{% endblock %}">
+  {% with current_url=request.resolver_match.url_name %}
+    <div class="app-shell">
+      <div class="sidebar-backdrop" data-sidebar-backdrop></div>
+      <div class="app-grid">
+        <aside class="app-sidebar" id="app-sidebar">
+          <div class="brand-mark">
+            <span class="brand-kicker">Personal research workspace</span>
+            <a class="brand-link" href="{% url 'public-feed' %}">YourLifeStory</a>
+            <p class="brand-copy">Collect writing, learning plans, journals, and publications in one calm operating space.</p>
+          </div>
+
+          <section class="nav-group">
+            <h2 class="nav-group-title">Public area</h2>
+            <div class="nav-list">
+              <a class="nav-link {% if current_url == 'public-feed' %}active{% endif %}" href="{% url 'public-feed' %}">
+                <div>
+                  <strong>Feed</strong>
+                  <span>Read what is public and recent</span>
+                </div>
+              </a>
+            </div>
+          </section>
+
+          {% if request.user.is_authenticated %}
+            <section class="nav-group">
+              <h2 class="nav-group-title">Workspace</h2>
+              <div class="nav-list">
+                <a class="nav-link {% if current_url == 'workspace' %}active{% endif %}" href="{% url 'workspace' %}">
+                  <div>
+                    <strong>Overview</strong>
+                    <span>Home, priorities, and next steps</span>
+                  </div>
+                </a>
+                <a class="nav-link {% if current_url == 'curriculum-list' or current_url == 'curriculum-detail' or current_url == 'curriculum-create' or current_url == 'curriculum-edit' or current_url == 'curriculum-delete' or current_url == 'topic-create' or current_url == 'topic-edit' or current_url == 'topic-delete' or current_url == 'lesson-create' or current_url == 'lesson-detail' or current_url == 'lesson-edit' or current_url == 'lesson-delete' or current_url == 'resource-edit' or current_url == 'resource-delete' or current_url == 'curriculum-resource-create' or current_url == 'membership-create' or current_url == 'membership-edit' or current_url == 'membership-delete' or current_url == 'user-state-edit' %}active{% endif %}" href="{% url 'curriculum:curriculum-list' %}">
+                  <div>
+                    <strong>Curriculums</strong>
+                    <span>Structured plans and progress</span>
+                  </div>
+                </a>
+                <a class="nav-link {% if current_url == 'my-publications' or current_url == 'publication-detail' or current_url == 'publication-create' or current_url == 'publication-edit' or current_url == 'publication-delete' or current_url == 'publication-all' %}active{% endif %}" href="{% url 'my-publications' %}">
+                  <div>
+                    <strong>Publications</strong>
+                    <span>Long-form writing and exports</span>
+                  </div>
+                </a>
+                <a class="nav-link {% if current_url == 'post-list' or current_url == 'post-detail' or current_url == 'post-create' or current_url == 'post-edit' or current_url == 'post-delete' %}active{% endif %}" href="{% url 'post-list' %}">
+                  <div>
+                    <strong>Posts</strong>
+                    <span>Short updates for the feed</span>
+                  </div>
+                </a>
+                <a class="nav-link {% if current_url == 'journal-list' or current_url == 'journal-detail' or current_url == 'journal-create' or current_url == 'journal-edit' or current_url == 'journal-delete' or current_url == 'journal-entry-list' or current_url == 'journal-entry-detail' or current_url == 'journal-entry-create' or current_url == 'journal-entry-edit' or current_url == 'journal-entry-delete' %}active{% endif %}" href="{% url 'journal:journal-list' %}">
+                  <div>
+                    <strong>Journal</strong>
+                    <span>Private entries and collections</span>
+                  </div>
+                </a>
+                <a class="nav-link {% if current_url == 'keyword-list' %}active{% endif %}" href="{% url 'keyword-list' %}">
+                  <div>
+                    <strong>Keywords</strong>
+                    <span>Shared publication taxonomy</span>
+                  </div>
+                </a>
+              </div>
+            </section>
+
+            {% if request.user.is_staff %}
+              <section class="nav-group">
+                <h2 class="nav-group-title">Admin</h2>
+                <div class="nav-list">
+                  <a class="nav-link {% if current_url == 'publication-all' %}active{% endif %}" href="{% url 'publication-all' %}">
+                    <div>
+                      <strong>All publications</strong>
+                      <span>Staff-wide publication visibility</span>
+                    </div>
+                  </a>
+                  <a class="nav-link" href="{% url 'admin:index' %}">
+                    <div>
+                      <strong>Django admin</strong>
+                      <span>Site settings and records</span>
+                    </div>
+                  </a>
+                </div>
+              </section>
+            {% endif %}
+          {% else %}
+            <section class="nav-group">
+              <h2 class="nav-group-title">Access</h2>
+              <div class="nav-list">
+                {% if site_settings.self_signup_enabled %}
+                  <a class="nav-link {% if current_url == 'signup' %}active{% endif %}" href="{% url 'signup' %}">
+                    <div>
+                      <strong>Create account</strong>
+                      <span>Open a protected workspace</span>
+                    </div>
+                  </a>
+                {% endif %}
+                <a class="nav-link {% if current_url == 'login' %}active{% endif %}" href="{% url 'login' %}">
+                  <div>
+                    <strong>Login</strong>
+                    <span>Return to your protected content</span>
+                  </div>
+                </a>
+              </div>
+            </section>
           {% endif %}
-          <a class="username-link" href="{% url 'workspace' %}">Signed in as {{ request.user.username }}</a>
-          <form method="post" action="{% url 'logout' %}" class="logout-form">
-            {% csrf_token %}
-            <button type="submit" class="secondary">Logout</button>
-          </form>
-        {% else %}
-          {% if site_settings.self_signup_enabled %}
-            <a href="{% url 'signup' %}">Sign up</a>
+
+          {% block app_sidebar_extra %}{% endblock %}
+
+          <div class="sidebar-footer">
+            {% if request.user.is_authenticated %}
+              <div class="account-chip">
+                <strong>{{ request.user.username }}</strong>
+                <p>Signed in. Protected drafts, journals, and study plans stay inside your session.</p>
+              </div>
+              <form method="post" action="{% url 'logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="secondary">Logout</button>
+              </form>
+            {% else %}
+              <div class="aside-note">
+                <strong>Private by default</strong>
+                <p>Anonymous visitors can browse public feed items, while drafts and journals remain protected.</p>
+              </div>
+            {% endif %}
+          </div>
+        </aside>
+
+        <main class="app-main">
+          <div class="mobile-bar">
+            <button class="nav-toggle secondary" type="button" data-nav-toggle aria-controls="app-sidebar" aria-expanded="false">Menu</button>
+            <a class="mobile-brand" href="{% url 'public-feed' %}">YourLifeStory</a>
+          </div>
+
+          <section class="page-intro">{% block page_header %}{% endblock %}{% block page_actions %}{% endblock %}{% block page_tools %}{% endblock %}</section>
+
+          {% if messages %}
+            <ul class="messages">
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
           {% endif %}
-          <a href="{% url 'login' %}">Login</a>
-        {% endif %}
-      </nav>
-    </header>
-    <main>
-      {% if messages %}
-        <ul class="messages">
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
-      {% block content %}{% endblock %}
-    </main>
-    <footer>
-      <p class="meta">
-        Public content appears in the feed. Drafts, journal entries, and non-public items stay protected by session authentication.
-      </p>
-    </footer>
-  </div>
+
+          <div class="content-stack">
+            {% block content %}{% endblock %}
+          </div>
+        </main>
+
+        <aside class="app-aside">
+          {% block page_aside %}
+            {% if request.user.is_authenticated %}
+              <section class="aside-section">
+                <h3>Current session</h3>
+                <p>{{ request.user.username }} is in the protected workspace. Use the sidebar to switch between writing, study, and journal flows.</p>
+              </section>
+              <section class="aside-section">
+                <h3>Workspace rhythm</h3>
+                <ul>
+                  <li>Use Posts for short feed updates.</li>
+                  <li>Use Publications for structured long-form writing.</li>
+                  <li>Use Journal for private daily capture.</li>
+                </ul>
+              </section>
+            {% else %}
+              <section class="aside-section">
+                <h3>How access works</h3>
+                <p>Public posts and publications remain visible here. Everything else opens once you sign in.</p>
+              </section>
+              <section class="aside-section">
+                <h3>Next step</h3>
+                <ul>
+                  {% if site_settings.self_signup_enabled %}
+                    <li><a class="text-link" href="{% url 'signup' %}">Create an account</a> to start writing privately.</li>
+                  {% endif %}
+                  <li><a class="text-link" href="{% url 'login' %}">Login</a> to reopen your workspace.</li>
+                </ul>
+              </section>
+            {% endif %}
+          {% endblock %}
+        </aside>
+      </div>
+    </div>
+  {% endwith %}
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      const body = document.body;
+      const navToggle = document.querySelector("[data-nav-toggle]");
+      const navBackdrop = document.querySelector("[data-sidebar-backdrop]");
+
+      const closeNav = () => {
+        body.classList.remove("nav-open");
+        if (navToggle) {
+          navToggle.setAttribute("aria-expanded", "false");
+        }
+      };
+
+      const openNav = () => {
+        body.classList.add("nav-open");
+        if (navToggle) {
+          navToggle.setAttribute("aria-expanded", "true");
+        }
+      };
+
+      if (navToggle) {
+        navToggle.addEventListener("click", () => {
+          if (body.classList.contains("nav-open")) {
+            closeNav();
+          } else {
+            openNav();
+          }
+        });
+      }
+
+      if (navBackdrop) {
+        navBackdrop.addEventListener("click", closeNav);
+      }
+
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 920) {
+          closeNav();
+        }
+      });
+
       document.querySelectorAll("[data-markdown-editor-shell]").forEach((shell) => {
         const textarea = shell.querySelector("[data-markdown-editor='true']");
         const toolbar = shell.querySelector(".markdown-toolbar");

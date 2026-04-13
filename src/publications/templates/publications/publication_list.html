@@ -1,36 +1,75 @@
 {% extends "base.html" %}
 {% block title %}My publications{% endblock %}
+
+{% block page_header %}
+  <div class="page-header">
+    <p class="eyebrow">Publications</p>
+    <h1 class="page-title">Manage long-form writing with structure and export.</h1>
+    <p class="page-subtitle">Publications hold deeper work: keywords, status, visibility, and markdown downloads all live here.</p>
+  </div>
+{% endblock %}
+
+{% block page_actions %}
+  <div class="button-row">
+    <a class="button-link" href="{% url 'publication-create' %}">Create publication</a>
+    <a class="button-link secondary" href="{% url 'keyword-list' %}">Manage keywords</a>
+  </div>
+{% endblock %}
+
+{% block page_tools %}
+  <form method="get" class="filter-row">
+    <label>Search <input type="search" name="q" value="{{ request.GET.q }}"></label>
+    <label>Keyword
+      <select name="keyword">
+        <option value="">All</option>
+        {% for keyword in keywords %}
+          <option value="{{ keyword.pk }}" {% if request.GET.keyword == keyword.pk|stringformat:"s" %}selected{% endif %}>{{ keyword.name }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button type="submit">Filter</button>
+  </form>
+{% endblock %}
+
+{% block page_aside %}
+  <section class="aside-section">
+    <h3>Library snapshot</h3>
+    <ul>
+      <li>{{ publications|length }} publication{{ publications|length|pluralize }} in the current result set.</li>
+      <li>{{ keywords|length }} shared keyword{{ keywords|length|pluralize }} available.</li>
+    </ul>
+  </section>
+  <section class="aside-section">
+    <h3>When to use this area</h3>
+    <p>Choose Publications for pieces that need a durable title, topic tagging, visibility control, and markdown export.</p>
+  </section>
+{% endblock %}
+
 {% block content %}
-<h2>My publications</h2>
-<div class="actions">
-  <a class="button-link" href="{% url 'publication-create' %}">Create publication</a>
-</div>
-
-<form method="get" class="filter-row">
-  <label>Search <input type="search" name="q" value="{{ request.GET.q }}"></label>
-  <label>Keyword
-    <select name="keyword">
-      <option value="">All</option>
-      {% for keyword in keywords %}
-        <option value="{{ keyword.pk }}" {% if request.GET.keyword == keyword.pk|stringformat:"s" %}selected{% endif %}>{{ keyword.name }}</option>
+  <section class="surface">
+    <div class="surface-header">
+      <h2>All matching publications</h2>
+      <span class="meta">{{ publications|length }} result{{ publications|length|pluralize }}</span>
+    </div>
+    <ul class="list-stream">
+      {% for publication in publications %}
+        <li>
+          <div class="stream-headline">
+            <a href="{% url 'publication-detail' publication.pk %}">{{ publication.title }}</a>
+            <span class="status-pill">{{ publication.get_status_display }}</span>
+          </div>
+          <p class="meta-cluster">
+            <span>{{ publication.get_visibility_display }}</span>
+            <span>Created {{ publication.created_at }}</span>
+            <span>Updated {{ publication.updated_at }}</span>
+          </p>
+          <div class="stream-actions">
+            <a href="{% url 'publication-download' publication.pk %}">Download markdown</a>
+          </div>
+        </li>
+      {% empty %}
+        <li class="empty-state">No publications match the current filter.</li>
       {% endfor %}
-    </select>
-  </label>
-  <button type="submit">Filter</button>
-</form>
-
-<ul class="card-list">
-  {% for publication in publications %}
-    <li>
-      <a href="{% url 'publication-detail' publication.pk %}">{{ publication.title }}</a>
-      <p class="meta">
-        {{ publication.get_status_display }} | {{ publication.get_visibility_display }}
-      </p>
-      <p class="meta">Created {{ publication.created_at }} | Updated {{ publication.updated_at }}</p>
-      <p><a href="{% url 'publication-download' publication.pk %}">Download markdown</a></p>
-    </li>
-  {% empty %}
-    <li>No publications yet.</li>
-  {% endfor %}
-</ul>
+    </ul>
+  </section>
 {% endblock %}

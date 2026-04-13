@@ -1,29 +1,74 @@
 {% extends "base.html" %}
 {% load core_markdown %}
 {% block title %}{{ publication.title }}{% endblock %}
-{% block content %}
-<article class="panel">
-  <h2>{{ publication.title }}</h2>
-  <p class="meta">By {{ publication.owner.username }}</p>
-  <p class="meta">Status: {{ publication.get_status_display }}</p>
-  <p class="meta">Visibility: {{ publication.get_visibility_display }}</p>
-  <p class="meta">Created: {{ publication.created_at }}</p>
-  <p class="meta">Updated: {{ publication.updated_at }}</p>
-  <div class="markdown-output">{{ publication.content|markdown }}</div>
-  <p>
-    Keywords:
-    {% for keyword in publication.keywords.all %}
-      <span>{{ keyword.name }}</span>{% if not forloop.last %}, {% endif %}
-    {% empty %}
-      <span>None</span>
-    {% endfor %}
-  </p>
-  <div class="actions">
+
+{% block page_header %}
+  <div class="page-header">
+    <p class="eyebrow">Publication detail</p>
+    <h1 class="page-title">{{ publication.title }}</h1>
+    <p class="page-subtitle">Review status, keywords, and the rendered document before editing, exporting, or publishing more broadly.</p>
+  </div>
+{% endblock %}
+
+{% block page_actions %}
+  <div class="button-row">
     <a class="button-link secondary" href="{% url 'publication-download' publication.pk %}">Download markdown</a>
     {% if can_edit %}
       <a class="button-link" href="{% url 'publication-edit' publication.pk %}">Edit</a>
       <a class="button-link secondary" href="{% url 'publication-delete' publication.pk %}">Delete</a>
     {% endif %}
   </div>
-</article>
+{% endblock %}
+
+{% block page_aside %}
+  <section class="aside-section">
+    <h3>Publication metadata</h3>
+    <ul>
+      <li>Author: {{ publication.owner.username }}</li>
+      <li>Status: {{ publication.get_status_display }}</li>
+      <li>Visibility: {{ publication.get_visibility_display }}</li>
+      <li>Created: {{ publication.created_at }}</li>
+      <li>Updated: {{ publication.updated_at }}</li>
+    </ul>
+  </section>
+  <section class="aside-section">
+    <h3>Keywords</h3>
+    <ul>
+      {% for keyword in publication.keywords.all %}
+        <li>{{ keyword.name }}</li>
+      {% empty %}
+        <li>No keywords assigned.</li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endblock %}
+
+{% block content %}
+  <article class="surface">
+    <div class="split-layout">
+      <div>
+        <div class="markdown-output">{{ publication.content|markdown }}</div>
+      </div>
+      <div class="doc-meta">
+        <div class="doc-meta-block">
+          <strong>Status</strong>
+          <span>{{ publication.get_status_display }}</span>
+        </div>
+        <div class="doc-meta-block">
+          <strong>Visibility</strong>
+          <span>{{ publication.get_visibility_display }}</span>
+        </div>
+        <div class="doc-meta-block">
+          <strong>Keywords</strong>
+          <p>
+            {% for keyword in publication.keywords.all %}
+              {{ keyword.name }}{% if not forloop.last %}, {% endif %}
+            {% empty %}
+              None
+            {% endfor %}
+          </p>
+        </div>
+      </div>
+    </div>
+  </article>
 {% endblock %}

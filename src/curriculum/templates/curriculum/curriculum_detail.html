@@ -3,56 +3,104 @@
 
 {% block title %}{{ curriculum.title }} | Curriculums{% endblock %}
 
-{% block content %}
-  <section class="panel">
-    <h1>{{ curriculum.title }}</h1>
-    <p class="meta">
-      Code: {{ curriculum.code }} | Visibility: {{ curriculum.get_visibility_display }} | Owner: {{ curriculum.owner.username }}
-      {% if role %}| Your role: {{ role }}{% endif %}
-      {% if curriculum.deadline %}| Deadline: {{ curriculum.deadline }}{% endif %}
-    </p>
-    <p><strong>Goal:</strong> {{ curriculum.goal|linebreaksbr }}</p>
-    <p><strong>Expected results:</strong> {{ curriculum.expected_results|linebreaksbr }}</p>
+{% block page_header %}
+  <div class="page-header">
+    <p class="eyebrow">Curriculum detail</p>
+    <h1 class="page-title">{{ curriculum.title }}</h1>
+    <p class="page-subtitle">Review learning goals, resources, topic flow, and access without losing sight of your current role or progress.</p>
+  </div>
+{% endblock %}
+
+{% block page_actions %}
+  <div class="button-row">
+    {% if can_edit_materials %}
+      <a class="button-link" href="{% url 'curriculum:curriculum-edit' curriculum.pk %}">Edit curriculum</a>
+      <a class="button-link secondary" href="{% url 'curriculum:topic-create' curriculum.pk %}">Add topic</a>
+      <a class="button-link secondary" href="{% url 'curriculum:curriculum-resource-create' curriculum.pk %}">Add resource</a>
+    {% endif %}
+    {% if can_manage_members %}
+      <a class="button-link secondary" href="{% url 'curriculum:membership-create' curriculum.pk %}">Add member</a>
+    {% endif %}
+    {% if can_enroll %}
+      <form method="post" action="{% url 'curriculum:curriculum-enroll' curriculum.pk %}" class="logout-form">
+        {% csrf_token %}
+        <button type="submit" class="secondary">Enroll as student</button>
+      </form>
+    {% endif %}
     {% if study_state %}
-      <p class="meta">You are enrolled as a learner. Your status: {{ study_state.get_status_display }} | Your progress: {{ progress_percent }}%</p>
+      <a class="button-link secondary" href="{% url 'curriculum:user-state-edit' curriculum.pk %}">Update your status</a>
+    {% endif %}
+    {% if can_edit_materials %}
+      <a class="button-link secondary" href="{% url 'curriculum:curriculum-delete' curriculum.pk %}">Delete curriculum</a>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block page_aside %}
+  <section class="aside-section">
+    <h3>Curriculum metadata</h3>
+    <ul>
+      <li>Code: {{ curriculum.code }}</li>
+      <li>Visibility: {{ curriculum.get_visibility_display }}</li>
+      <li>Owner: {{ curriculum.owner.username }}</li>
+      {% if role %}<li>Your role: {{ role }}</li>{% endif %}
+      {% if curriculum.deadline %}<li>Deadline: {{ curriculum.deadline }}</li>{% endif %}
+    </ul>
+  </section>
+  {% if study_state %}
+    <section class="aside-section">
+      <h3>Your study state</h3>
+      <ul>
+        <li>Status: {{ study_state.get_status_display }}</li>
+        <li>Progress: {{ progress_percent }}%</li>
+      </ul>
+    </section>
+  {% endif %}
+  <section class="aside-section">
+    <h3>Section guide</h3>
+    <ul>
+      <li>Resources hold curriculum-wide references.</li>
+      <li>Topics define lesson order and structure.</li>
+      <li>Members control who can collaborate or study.</li>
+    </ul>
+  </section>
+{% endblock %}
+
+{% block content %}
+  <section class="surface">
+    <div class="surface-header">
+      <h2>Overview</h2>
+      <span class="status-pill">{{ curriculum.get_visibility_display }}</span>
+    </div>
+    <p class="surface-intro"><strong>Goal:</strong> {{ curriculum.goal|linebreaksbr }}</p>
+    <p class="surface-intro"><strong>Expected results:</strong> {{ curriculum.expected_results|linebreaksbr }}</p>
+    {% if study_state %}
+      <p class="meta">You are enrolled as a learner. Current status: {{ study_state.get_status_display }}. Progress: {{ progress_percent }}%.</p>
     {% elif can_enroll %}
       <p class="meta">You can enroll as a student without losing your authoring access.</p>
     {% endif %}
-    <div class="actions">
-      {% if can_edit_materials %}
-        <a class="button-link" href="{% url 'curriculum:curriculum-edit' curriculum.pk %}">Edit curriculum</a>
-        <a class="button-link" href="{% url 'curriculum:topic-create' curriculum.pk %}">Add topic</a>
-        <a class="button-link" href="{% url 'curriculum:curriculum-resource-create' curriculum.pk %}">Add curriculum resource</a>
-      {% endif %}
-      {% if can_manage_members %}
-        <a class="button-link secondary" href="{% url 'curriculum:membership-create' curriculum.pk %}">Add member</a>
-      {% endif %}
-      {% if can_enroll %}
-        <form method="post" action="{% url 'curriculum:curriculum-enroll' curriculum.pk %}" class="logout-form">
-          {% csrf_token %}
-          <button type="submit" class="secondary">Enroll as student</button>
-        </form>
-      {% endif %}
-      {% if study_state %}
-        <a class="button-link secondary" href="{% url 'curriculum:user-state-edit' curriculum.pk %}">Update your status</a>
-      {% endif %}
-      {% if can_edit_materials %}
-        <a class="button-link secondary" href="{% url 'curriculum:curriculum-delete' curriculum.pk %}">Delete curriculum</a>
-      {% endif %}
-    </div>
   </section>
 
   {% if curriculum.resources.exists %}
-    <section class="panel" style="margin-top: 1rem;">
-      <h2>Curriculum resources</h2>
-      <ul>
+    <section class="surface">
+      <div class="surface-header">
+        <h2>Curriculum resources</h2>
+        <span class="meta">Shared references for the whole plan</span>
+      </div>
+      <ul class="list-stream">
         {% for resource in curriculum.resources.all %}
           <li>
-            <a href="{{ resource.url }}">{{ resource.title }}</a>
-            {% if resource.notes %} - {{ resource.notes }}{% endif %}
+            <div class="stream-headline">
+              <a href="{{ resource.url }}">{{ resource.title }}</a>
+            </div>
+            {% if resource.notes %}
+              <p class="stream-copy">{{ resource.notes }}</p>
+            {% endif %}
             {% if can_edit_materials %}
-              <a href="{% url 'curriculum:resource-edit' resource.pk %}">Edit</a>
-              <a href="{% url 'curriculum:resource-delete' resource.pk %}">Delete</a>
+              <div class="stream-actions">
+                <a href="{% url 'curriculum:resource-edit' resource.pk %}">Edit</a>
+                <a href="{% url 'curriculum:resource-delete' resource.pk %}">Delete</a>
+              </div>
             {% endif %}
           </li>
         {% endfor %}
@@ -60,58 +108,73 @@
     </section>
   {% endif %}
 
-  <section class="panel" style="margin-top: 1rem;">
-    <h2>Topics and lessons</h2>
-    <ul class="card-list">
+  <section class="surface">
+    <div class="surface-header">
+      <h2>Topics and lessons</h2>
+      <span class="meta">Ordered study path</span>
+    </div>
+    <ul class="list-stream">
       {% for topic in topics %}
         <li>
-          <h3>{{ topic.position }}. {{ topic.title }}</h3>
+          <div class="stream-headline">
+            <strong>{{ topic.position }}. {{ topic.title }}</strong>
+          </div>
           {% if topic.summary %}
-            <p>{{ topic.summary|linebreaksbr }}</p>
+            <p class="stream-copy">{{ topic.summary|linebreaksbr }}</p>
           {% endif %}
           {% if can_edit_materials %}
-            <div class="actions">
-              <a class="button-link secondary" href="{% url 'curriculum:topic-edit' topic.pk %}">Edit topic</a>
-              <a class="button-link secondary" href="{% url 'curriculum:topic-delete' topic.pk %}">Delete topic</a>
-              <a class="button-link secondary" href="{% url 'curriculum:lesson-create' topic.pk %}">Add lesson</a>
+            <div class="stream-actions">
+              <a href="{% url 'curriculum:topic-edit' topic.pk %}">Edit topic</a>
+              <a href="{% url 'curriculum:topic-delete' topic.pk %}">Delete topic</a>
+              <a href="{% url 'curriculum:lesson-create' topic.pk %}">Add lesson</a>
             </div>
           {% endif %}
-          <ol>
+          <ul class="list-stream">
             {% for lesson in topic.lessons.all %}
               <li>
-                {% if can_view_lesson_content %}
-                  <a href="{% url 'curriculum:lesson-detail' lesson.pk %}">{{ lesson.title }}</a>
-                {% else %}
-                  {{ lesson.title }}
-                {% endif %}
-                {% if lesson.deadline %}<span class="meta"> (Deadline: {{ lesson.deadline }})</span>{% endif %}
+                <div class="stream-headline">
+                  {% if can_view_lesson_content %}
+                    <a href="{% url 'curriculum:lesson-detail' lesson.pk %}">{{ lesson.title }}</a>
+                  {% else %}
+                    <strong>{{ lesson.title }}</strong>
+                  {% endif %}
+                  {% if lesson.deadline %}<span class="meta">Deadline {{ lesson.deadline }}</span>{% endif %}
+                </div>
                 {% if can_view_lesson_content and lesson_progress|get_item:lesson.pk %}
-                  <span class="meta"> - {{ lesson_progress|get_item:lesson.pk }}</span>
+                  <p class="meta">{{ lesson_progress|get_item:lesson.pk }}</p>
                 {% endif %}
               </li>
             {% empty %}
-              <li>No lessons yet.</li>
+              <li class="empty-state">No lessons yet.</li>
             {% endfor %}
-          </ol>
+          </ul>
         </li>
       {% empty %}
-        <li>No topics yet.</li>
+        <li class="empty-state">No topics yet.</li>
       {% endfor %}
     </ul>
   </section>
 
   {% if can_manage_members %}
-    <section class="panel" style="margin-top: 1rem;">
-      <h2>Members</h2>
-      <ul>
+    <section class="surface">
+      <div class="surface-header">
+        <h2>Members</h2>
+        <span class="meta">People with explicit access</span>
+      </div>
+      <ul class="list-stream">
         {% for membership in memberships %}
           <li>
-            {{ membership.user.username }} - {{ membership.get_role_display }}
-            <a href="{% url 'curriculum:membership-edit' membership.pk %}">Edit</a>
-            <a href="{% url 'curriculum:membership-delete' membership.pk %}">Delete</a>
+            <div class="stream-headline">
+              <strong>{{ membership.user.username }}</strong>
+              <span class="status-pill">{{ membership.get_role_display }}</span>
+            </div>
+            <div class="stream-actions">
+              <a href="{% url 'curriculum:membership-edit' membership.pk %}">Edit</a>
+              <a href="{% url 'curriculum:membership-delete' membership.pk %}">Delete</a>
+            </div>
           </li>
         {% empty %}
-          <li>No additional members.</li>
+          <li class="empty-state">No additional members.</li>
         {% endfor %}
       </ul>
     </section>

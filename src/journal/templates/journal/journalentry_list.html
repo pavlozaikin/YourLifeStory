@@ -1,24 +1,55 @@
 {% extends "base.html" %}
 {% block title %}My journal{% endblock %}
-{% block content %}
-<section>
-  <h2>{{ journal.title }}</h2>
-  <p class="meta">Your private journal entries.</p>
-  <div class="actions">
-    <a class="button-link" href="{% url 'journal:journal-entry-create' %}">Create entry</a>
+
+{% block page_header %}
+  <div class="page-header">
+    <p class="eyebrow">Journal entries</p>
+    <h1 class="page-title">{{ journal.title }}</h1>
+    <p class="page-subtitle">Review private entries in sequence and open any entry for editing, sharing, or markdown export.</p>
   </div>
-  <ul class="card-list">
-    {% for entry in entries %}
-      <li>
-        <a href="{% url 'journal:journal-entry-detail' entry.pk %}">{{ entry.display_title }}</a>
-        <p class="meta">Created {{ entry.created_at }} | Updated {{ entry.updated_at }}</p>
-      </li>
-    {% empty %}
-      <li>
-        <p>No journal entries yet.</p>
-        <p class="meta">Create your first entry to begin capturing thoughts.</p>
-      </li>
-    {% endfor %}
-  </ul>
-</section>
+{% endblock %}
+
+{% block page_actions %}
+  <div class="button-row">
+    <a class="button-link" href="{% url 'journal:journal-entry-create' %}">Create entry</a>
+    <a class="button-link secondary" href="{% url 'journal:journal-list' %}">All journals</a>
+  </div>
+{% endblock %}
+
+{% block page_aside %}
+  <section class="aside-section">
+    <h3>Current collection</h3>
+    <p>{{ entries|length }} entr{{ entries|length|pluralize:"y,ies" }} visible in {{ journal.title }}.</p>
+  </section>
+  <section class="aside-section">
+    <h3>Reminder</h3>
+    <p>Journal entries are private by default and can later be shared or exported if needed.</p>
+  </section>
+{% endblock %}
+
+{% block content %}
+  <section class="surface">
+    <div class="surface-header">
+      <h2>Entries</h2>
+      <span class="meta">Private capture stream</span>
+    </div>
+    <ul class="list-stream">
+      {% for entry in entries %}
+        <li>
+          <div class="stream-headline">
+            <a href="{% url 'journal:journal-entry-detail' entry.pk %}">{{ entry.display_title }}</a>
+          </div>
+          <p class="meta-cluster">
+            <span>Created {{ entry.created_at }}</span>
+            <span>Updated {{ entry.updated_at }}</span>
+          </p>
+        </li>
+      {% empty %}
+        <li class="empty-state">
+          <p>No journal entries yet.</p>
+          <p class="meta">Create your first entry to begin capturing thoughts.</p>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
 {% endblock %}

@@ -2,27 +2,57 @@
 
 {% block title %}Curriculums | YourLifeStory{% endblock %}
 
-{% block content %}
-  <section class="panel">
-    <h1>Curriculums</h1>
-    <p>Structured learning plans you own or can access.</p>
-    <div class="actions">
-      <a class="button-link" href="{% url 'curriculum:curriculum-create' %}">Create curriculum</a>
-    </div>
-  </section>
+{% block page_header %}
+  <div class="page-header">
+    <p class="eyebrow">Curriculums</p>
+    <h1 class="page-title">Track structured learning plans and study progress.</h1>
+    <p class="page-subtitle">Curriculums gather topics, lessons, resources, access, and learner progress into one durable plan surface.</p>
+  </div>
+{% endblock %}
 
-  <section class="panel" style="margin-top: 1rem;">
-    <ul class="card-list">
-      {% for curriculum in curricula %}
-        <li>
-          <h2><a href="{% url 'curriculum:curriculum-detail' curriculum.pk %}">{{ curriculum.title }}</a></h2>
-          <p class="meta">Code: {{ curriculum.code }} | Visibility: {{ curriculum.get_visibility_display }} | Owner: {{ curriculum.owner.username }}</p>
-          <p>{{ curriculum.goal|truncatechars:180 }}</p>
-        </li>
-      {% empty %}
-        <li>No curriculums yet.</li>
-      {% endfor %}
+{% block page_actions %}
+  <div class="button-row">
+    <a class="button-link" href="{% url 'curriculum:curriculum-create' %}">Create curriculum</a>
+  </div>
+{% endblock %}
+
+{% block page_aside %}
+  <section class="aside-section">
+    <h3>Curriculum library</h3>
+    <p>{{ curricula|length }} curriculum{{ curricula|length|pluralize }} visible with your current access.</p>
+  </section>
+  <section class="aside-section">
+    <h3>What belongs here</h3>
+    <ul>
+      <li>Longer learning arcs with topics and lessons.</li>
+      <li>Member access and role-based editing.</li>
+      <li>Per-user progress and completion tracking.</li>
     </ul>
   </section>
 {% endblock %}
 
+{% block content %}
+  <section class="surface">
+    <div class="surface-header">
+      <h2>Available curriculums</h2>
+      <span class="meta">{{ curricula|length }} result{{ curricula|length|pluralize }}</span>
+    </div>
+    <ul class="list-stream">
+      {% for curriculum in curricula %}
+        <li>
+          <div class="stream-headline">
+            <a href="{% url 'curriculum:curriculum-detail' curriculum.pk %}">{{ curriculum.title }}</a>
+            <span class="status-pill">{{ curriculum.get_visibility_display }}</span>
+          </div>
+          <p class="meta-cluster">
+            <span>Code {{ curriculum.code }}</span>
+            <span>Owner {{ curriculum.owner.username }}</span>
+          </p>
+          <p class="stream-copy">{{ curriculum.goal|truncatechars:180 }}</p>
+        </li>
+      {% empty %}
+        <li class="empty-state">No curriculums exist yet.</li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endblock %}
